@@ -1,0 +1,46 @@
+{
+  "name": "socketio-method-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "compile": "export ENV=dev && tsc && node dist/server.js",
+    "dev": "nodemon -e ts  --exec \"yarn compile\"",
+    "dumb:db": "node seed.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/core": "^7.3.4",
+    "@types/body-parser": "^1.17.0",
+    "@types/compression": "^1.7.2",
+    "@types/cors": "^2.8.12",
+    "@types/express": "4.17.1",
+    "@types/jest": "^26.0.4",
+    "@types/joi": "17.2.3",
+    "@types/lodash": "^4.14.182",
+    "@types/multiparty": "^0.0.33",
+    "@types/rimraf": "^3.0.2",
+    "@types/sharp": "^0.30.4",
+    "@types/supertest": "^2.0.10",
+    "@types/uuid": "^8.3.4",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "latest",
+    "connect-flash": "^0.1.1",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "express": "^4.16.3",
+    "express-session": "^1.17.1",
+    "mongoose": "^5.7.12",
+    "node-fetch": "^2.6.1",
+    "nodemon": "^2.0.19",
+    "passport": "latest",
+    "passport-local": "latest",
+    "socket.io": "^4.5.1"
+  },
+  "devDependencies": {
+    "express-swagger-generator": "^1.1.17",
+    "typescript": "^4.7.4"
+  }
+}

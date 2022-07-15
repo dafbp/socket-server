@@ -1,0 +1,6 @@
+{
+  "watch": ["socket", "routes"],
+  "ext": "ts",
+  "ignore": ["src/**/*.spec.ts"],
+  "exec": "ts-node server.ts"
+}

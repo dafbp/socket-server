@@ -1,0 +1,130 @@
+
+import express from 'express';
+const app = express();
+import http from 'http';
+import cors from 'cors';
+import session from 'express-session';
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
+const expressSwagger = require('express-swagger-generator')(app);
+import srvConfig from './config';
+import mongoose from 'mongoose';
+
+const {CONNECTION_TYPE, DB_HOST, DB_USERNAME, DB_PASSWORD, DB_PORT, DB_NAME, DB_QUERY_PARAMS} = srvConfig;
+const dbAuthString = (DB_USERNAME && DB_PASSWORD) ? `${srvConfig.DB_USERNAME}:${srvConfig.DB_PASSWORD}@` : '';
+let httpServer;
+import socketABIMethod from './socket/abi/abi.json';
+import fs from 'fs';
+
+/**
+ * Configure middleware
+ */
+app.use(
+    cors({
+        // origin: `http://localhost:${srvConfig.SERVER_PORT}`,
+        origin: function (origin, callback) {
+            return callback(null, true)
+        },
+        optionsSuccessStatus: 200,
+        credentials: true
+    }),
+    session({
+        saveUninitialized: true,
+        secret: srvConfig.SESSION_SECRET,
+        resave: true
+    }),
+    cookieParser(),
+    bodyParser.json()
+);
+
+/**
+ * Include all API Routes
+ */
+import routesConfig from './routes/api';
+app.use('/api', routesConfig );
+
+/**
+ * Swagger UI documentation
+ */
+if (srvConfig.SWAGGER_SETTINGS.enableSwaggerUI)
+    expressSwagger(srvConfig.SWAGGER_SETTINGS);
+
+/**
+ * Configure http(s)Server
+ */
+if (srvConfig.HTTPS_ENABLED) {
+    const privateKey = fs.readFileSync(srvConfig.PRIVATE_KEY_PATH, 'utf8');
+    const certificate = fs.readFileSync(srvConfig.CERTIFICATE_PATH, 'utf8');
+    const ca = fs.readFileSync(srvConfig.CA_PATH, 'utf8');
+
+    // Create a HTTPS server 
+    // @ts-expect-error
+    httpServer = https.createServer({key: privateKey, cert: certificate, ca: ca}, app);
+} else {
+    // Create a HTTP server
+    httpServer = http.createServer({}, app);
+}
+
+/**
+ * Start http server & connect to MongoDB
+ */
+httpServer.listen(srvConfig.SERVER_PORT, () => {
+    mongoose.connect(`${CONNECTION_TYPE}://${dbAuthString}${DB_HOST}:${DB_PORT}/${DB_NAME}${DB_QUERY_PARAMS}`, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    }, () => {
+        console.log(`Server started on port ${srvConfig.SERVER_PORT}`);
+    });
+});
+
+/**
+ * Socket.io section
+ */
+const io = require('socket.io')(httpServer);
+io.on('connection', function (socket) {
+    console.log(`New connection: ${socket.id}`);
+    // send a message to the client
+    socket.emit('hello', 'Hello!', { mr: 'john' }, Uint8Array.from([1, 2, 3, 4]));
+
+    socket.on('method', req => {
+        if (req.method === 'abi' && socketABIMethod[req.method]) {
+            if (req.data.method === 'all') {
+                socket.emit('method-response', {
+                    type: 'private',
+                    message: 'Lấy ABI thành công',
+                    data: socketABIMethod,
+                });
+            } else {
+                socket.emit('method-response', {
+                    type: 'private',
+                    message: 'Lấy ABI thành công',
+                    data: socketABIMethod[req.data.method],
+                });
+            }
+        } else if (req.method === 'auth' && socketABIMethod[req.method]) {
+            const isValidateInput = validateInput(socket, req.data, socketABIMethod[req.method])
+
+            console.log(req, socketABIMethod[req.method]);
+            socket.emit('method-response', {
+                type: 'success',
+                message: 'Thành công',
+                data: socketABIMethod[req.method].output,
+            });
+        } else {
+            socket.emit('method-response', { type: 'error', message: "Method sai" })
+        }
+        console.log('method', req); 
+    });
+
+    socket.on('message', data => {
+        console.log('message', data);
+    });
+
+    socket.on('disconnect', () => console.log(`Connection left (${socket.id})`));
+});
+
+const validateInput = (socket, data, methodConfig) => {
+    
+
+    return false
+}

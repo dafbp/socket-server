@@ -1,0 +1,34 @@
+{
+    "abi": {
+        "authen": false,
+        "input": [
+            {
+                "param": "method",
+                "type": "string"
+            }
+        ],
+        "output": []
+    },
+    "auth": {
+        "input": [
+            {
+                "param": "username",
+                "type": "string"
+            },
+            {
+                "param": "password",
+                "type": "string"
+            }
+        ],
+        "output": [
+            {
+                "param": "username",
+                "type": "string"
+            },
+            {
+                "param": "password",
+                "type": "string"
+            }
+        ]
+    }
+}
