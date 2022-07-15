@@ -10,7 +10,7 @@ const expressSwagger = require('express-swagger-generator')(app);
 import srvConfig from './config';
 import mongoose from 'mongoose';
 
-const {CONNECTION_TYPE, DB_HOST, DB_USERNAME, DB_PASSWORD, DB_PORT, DB_NAME, DB_QUERY_PARAMS} = srvConfig;
+const { CONNECTION_TYPE, DB_HOST, DB_USERNAME, DB_PASSWORD, DB_PORT, DB_NAME, DB_QUERY_PARAMS } = srvConfig;
 const dbAuthString = (DB_USERNAME && DB_PASSWORD) ? `${srvConfig.DB_USERNAME}:${srvConfig.DB_PASSWORD}@` : '';
 let httpServer;
 import socketABIMethod from './socket/abi/abi.json';
@@ -42,7 +42,8 @@ app.use(
  * Include all API Routes
  */
 import routesConfig from './routes/api';
-app.use('/api', routesConfig );
+import { methodRes } from './socket/utilities/methodRes';
+app.use('/api', routesConfig);
 
 /**
  * Swagger UI documentation
@@ -60,7 +61,7 @@ if (srvConfig.HTTPS_ENABLED) {
 
     // Create a HTTPS server 
     // @ts-expect-error
-    httpServer = https.createServer({key: privateKey, cert: certificate, ca: ca}, app);
+    httpServer = https.createServer({ key: privateKey, cert: certificate, ca: ca }, app);
 } else {
     // Create a HTTP server
     httpServer = http.createServer({}, app);
@@ -87,33 +88,50 @@ io.on('connection', function (socket) {
     // send a message to the client
     socket.emit('hello', 'Hello!', { mr: 'john' }, Uint8Array.from([1, 2, 3, 4]));
 
-    socket.on('method', (req: IReqMethodCall ) => {
+    socket.on('method', (req: IReqMethodCall) => {
         if (req.method === 'abi' && socketABIMethod[req.method]) {
             if (req.params[0] === 'all') {
-                socket.emit('method-response', {
-                    type: 'private',
+                methodRes.private(socket, {
                     method: req.method,
                     id: req.id,
                     message: 'Lấy ABI thành công',
                     result: socketABIMethod,
-                });
+                })
             } else {
-                socket.emit('method-response', {
-                    type: 'private',
+                methodRes.private(socket, {
                     method: req.method,
                     id: req.id,
                     message: 'Lấy ABI thành công',
                     result: socketABIMethod[req.params[0]],
-                });
+                })
             }
         } else if (req.method === 'auth' && socketABIMethod[req.method]) {
-            const isValidateInput = validateInput(socket, req.params, socketABIMethod[req.method])
-            const call = methodCall[req.method]
-            call(socket, socketABIMethod[req.method], req)
+            const { isValidatedRequest, messageError } = validateRequest(socket, req.params, socketABIMethod[req.method])
+            // ---- 
+            if (isValidatedRequest) {
+                const call = methodCall[req.method]
+                if (typeof call !== 'function') {
+                    methodRes.error(socket, {
+                        id: req.id,
+                        method: req.method,
+                        message: "Internal server error",
+                        result: [],
+                    })
+                } else {
+                    call(socket, socketABIMethod[req.method], req)
+                }
+            } else {
+                methodRes.error(socket, {
+                    id: req.id,
+                    method: req.method,
+                    message: messageError,
+                    result: [],
+                })
+            }
         } else {
             socket.emit('method-response', { type: 'error', message: "Method sai" })
         }
-        console.log('method', req); 
+        console.log('method', req);
     });
 
     socket.on('message', data => {
@@ -123,8 +141,12 @@ io.on('connection', function (socket) {
     socket.on('disconnect', () => console.log(`Connection left (${socket.id})`));
 });
 
-const validateInput = (socket, data, methodConfig) => {
-    
+const validateRequest = (socket, data, methodConfigABI) => {
+    if (methodConfigABI?.input?.length !== data?.length) {
+        return { messageError: "Internal server error: validateRequest failed", isValidatedRequest: false }
+    } else if (false) {
+        return { messageError: "Internal server error: validateRequest failed", isValidatedRequest: false }
+    }
 
-    return false
+    return { messageError: "", isValidatedRequest: true }
 }

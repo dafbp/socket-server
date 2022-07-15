@@ -17,7 +17,8 @@ declare global {
         method: string;
         id: number,
         result: Object | Object[]
-        type: 'private' | 'success' | 'error',
+        message: string,
+        type?: 'private' | 'success' | 'error',
     }
 
 }
