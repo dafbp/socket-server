@@ -7,8 +7,18 @@ declare global {
      * or augment existing declarations in the global namespace.
 
      */
-    interface IGlobalConstants {
-        secCodeList: '888' | '020' | '061' | '081' | '099'
-    } 
+    interface IReqMethodCall {
+        method: string;
+        id: number,
+        params: (number | string | any)[]
+        
+    }
+    interface IResMethodCall {
+        method: string;
+        id: number,
+        result: Object | Object[]
+        type: 'private' | 'success' | 'error',
+    }
+
 }
 export { };

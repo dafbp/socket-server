@@ -15,6 +15,7 @@ const dbAuthString = (DB_USERNAME && DB_PASSWORD) ? `${srvConfig.DB_USERNAME}:${
 let httpServer;
 import socketABIMethod from './socket/abi/abi.json';
 import fs from 'fs';
+import methodCall from './socket/method'
 
 /**
  * Configure middleware
@@ -86,30 +87,29 @@ io.on('connection', function (socket) {
     // send a message to the client
     socket.emit('hello', 'Hello!', { mr: 'john' }, Uint8Array.from([1, 2, 3, 4]));
 
-    socket.on('method', req => {
+    socket.on('method', (req: IReqMethodCall ) => {
         if (req.method === 'abi' && socketABIMethod[req.method]) {
-            if (req.data.method === 'all') {
+            if (req.params[0] === 'all') {
                 socket.emit('method-response', {
                     type: 'private',
+                    method: req.method,
+                    id: req.id,
                     message: 'Lấy ABI thành công',
-                    data: socketABIMethod,
+                    result: socketABIMethod,
                 });
             } else {
                 socket.emit('method-response', {
                     type: 'private',
+                    method: req.method,
+                    id: req.id,
                     message: 'Lấy ABI thành công',
-                    data: socketABIMethod[req.data.method],
+                    result: socketABIMethod[req.params[0]],
                 });
             }
         } else if (req.method === 'auth' && socketABIMethod[req.method]) {
-            const isValidateInput = validateInput(socket, req.data, socketABIMethod[req.method])
-
-            console.log(req, socketABIMethod[req.method]);
-            socket.emit('method-response', {
-                type: 'success',
-                message: 'Thành công',
-                data: socketABIMethod[req.method].output,
-            });
+            const isValidateInput = validateInput(socket, req.params, socketABIMethod[req.method])
+            const call = methodCall[req.method]
+            call(socket, socketABIMethod[req.method], req)
         } else {
             socket.emit('method-response', { type: 'error', message: "Method sai" })
         }
