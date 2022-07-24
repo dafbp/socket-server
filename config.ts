@@ -18,10 +18,10 @@ const SESSION_SECRET = 'Z>lFs46=B)$u(742x5(iEH6k&m';
  */
 const CONNECTION_TYPE = "mongodb";
 const DB_USERNAME = "admin";
-const DB_PASSWORD = "admin@123";
+const DB_PASSWORD = "admin123";
 const DB_HOST = "localhost";
 const DB_PORT = "27017";
-const DB_NAME = "data-db";
+const DB_NAME = "nvd-db";
 const DB_QUERY_PARAMS = "";
 
 /**
