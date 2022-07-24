@@ -26,6 +26,7 @@ class SocketRealTimeAPI {
             timeout: 2000,
             secure: true,
             reconnection: false,
+            transports: ['websocket']
         }
         this.socket = io(SOCKET_SERVER, options)
         if (this.socket !== null) {
@@ -88,8 +89,10 @@ class SocketRealTimeAPI {
     }
     // ------- 
     private _listenMainEvent = (): void => {
+        console.log("_listenMainEvent >>>>>>>>>>");
+        
         this.socket.on(RES_CHANELS.method_response, (msg: IResMsg) => {
-            console.log("response message");
+            console.log("response message", msg);
             
         })
     }

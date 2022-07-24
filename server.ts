@@ -24,14 +24,14 @@ app.use(
     cors({
         // origin: `http://localhost:${srvConfig.SERVER_PORT}`,
         // origin: "http://localhost:3000",
-        // origin: function (origin, callback) {
-        //     console.log("origin function", origin, callback);
+        origin: function (origin, callback) {
+            console.log("origin function", origin, callback);
             
-        //         return callback(null, true)
-        //     },
-        origin: "*",
-        // optionsSuccessStatus: 200,
-        // credentials: true
+                return callback(null, true)
+            },
+        // origin: "*",
+        optionsSuccessStatus: 200,
+        credentials: true
     }),
     session({
         saveUninitialized: true,
