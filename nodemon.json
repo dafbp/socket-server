@@ -1,5 +1,5 @@
 {
-  "watch": ["socket", "routes"],
+  "watch": ["socket", "routes", "server.ts"],
   "ext": "ts",
   "ignore": ["src/**/*.spec.ts"],
   "exec": "ts-node server.ts"

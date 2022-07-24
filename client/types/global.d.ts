@@ -1,18 +1,17 @@
 
-declare global {
-    declare module '*.svg' {
-        const content: React.FunctionComponent<React.SVGAttributes<SVGElement>>;
-        export default content;
+declare global {    
+    interface ISendMsg {
+        id?: number
+        method: string
+        params: any[]
     }
-    declare module '*.png' {
-        const value: import('react-native').ImageSourcePropType;
-        export default value;
+    interface IResMsg {
+        id: number
+        method: string
+        type: 'success' | 'error' | 'private' 
+        message: string
+        result: any | any[]
     }
-    declare module '*.ico' {
-        const value: import('react-native').ImageSourcePropType;
-        export default value;
-    }
-    
 }
 export { };
 
