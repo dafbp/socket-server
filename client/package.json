@@ -12,9 +12,9 @@
     "chart.js": "2.9.4",
     "gulp": "4.0.2",
     "gulp-append-prepend": "1.0.8",
-    "next": "10.0.9",
-    "react": "17.0.1",
-    "react-dom": "17.0.1",
+    "next": "^12.2.3",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
     "react-scripts": "4.0.3",
     "tailwindcss": "2.0.4"
   },
@@ -22,7 +22,7 @@
     "start": "next start",
     "build": "next build",
     "dev": "next dev",
-    "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm run build:tailwind && npm run dev",
+    "install:clean": "rm -rf node_modules/ && rm -rf yarn.lock && yarn && yarn build:tailwind && yarn dev",
     "build:tailwind": "tailwind build styles/index.css -o styles/tailwind.css"
   },
   "eslintConfig": {
@@ -44,7 +44,16 @@
     "typescript": "4.2.3"
   },
   "devDependencies": {
+    "@types/jest": "^28.1.2",
+    "@types/node": "^18.0.0",
+    "@types/react": "^18.0.15",
+    "@types/react-dom": "^18.0.5",
+    "@typescript-eslint/eslint-plugin": "^5.30.6",
+    "@typescript-eslint/parser": "^5.30.6",
     "autoprefixer": "10.2.5",
-    "postcss": "8.2.8"
+    "eslint-plugin-eslint-plugin": "^3.4.0",
+    "eslint-plugin-react": "^7.24.0",
+    "postcss": "8.2.8",
+    "typescript": "^4.7.4"
   }
 }
