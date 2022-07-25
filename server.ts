@@ -47,6 +47,8 @@ app.use(
  */
 import routesConfig from './routes/api';
 import { methodRes } from './socket/utilities/methodRes';
+import { createWebSocket } from './socket/services/index';
+import { marketRes } from './socket/utilities/marketRes';
 app.use('/api', routesConfig);
 
 /**
@@ -145,6 +147,24 @@ io.on('connection', function (socket) {
     });
 
     socket.on('disconnect', () => console.log(`Connection left (${socket.id})`));
+    // -------
+    const wsCoinAPI = createWebSocket()
+    const exampleCall = {
+        type: 'hello',
+        apikey: '9FA323AE-5E94-4087-9AF4-EBBA6326297C',
+        heartbeat: false,
+        subscribe_data_type: ['quote'],
+        subscribe_filter_asset_id: ['BTC', 'ETH'],
+    };
+    wsCoinAPI.on('open', function open() {
+        // wsCoinAPI.send(JSON.stringify(exampleCall));
+    });
+
+    wsCoinAPI.on('message', function incoming(data) {
+        // marketRes.qoute(socket, JSON.parse(data.toString()))
+        // console.log('data wsCoinAPI', JSON.parse(data.toString()));
+    });
+
 });
 
 const validateRequest = (socket, data, methodConfigABI) => {
