@@ -49,6 +49,8 @@ import routesConfig from './routes/api';
 import { methodRes } from './socket/utilities/methodRes';
 import { createWebSocket } from './socket/services/index';
 import { marketRes } from './socket/utilities/marketRes';
+import SubcriberManagerInstance from './socket/market/index';
+
 app.use('/api', routesConfig);
 
 /**
@@ -88,11 +90,16 @@ httpServer.listen(srvConfig.SERVER_PORT, () => {
 });
 
 /**
+ * const wsCoinAPI = createWebSocket()
+ */
+
+/**
  * Socket.io section
  */
 const io = require('socket.io')(httpServer);
 io.on('connection', function (socket) {
     console.log(`New connection: ${socket.id}`);
+    SubcriberManagerInstance.createSubMapPerUser(socket.id)
     // send a message to the client
     socket.emit('hello', 'Hello!', { mr: 'john' }, Uint8Array.from([1, 2, 3, 4]));
 
@@ -148,21 +155,40 @@ io.on('connection', function (socket) {
 
     socket.on('disconnect', () => console.log(`Connection left (${socket.id})`));
     // -------
-    const wsCoinAPI = createWebSocket()
     const exampleCall = {
         type: 'hello',
         apikey: '9FA323AE-5E94-4087-9AF4-EBBA6326297C',
         heartbeat: false,
-        subscribe_data_type: ['quote'],
-        subscribe_filter_asset_id: ['BTC', 'ETH'],
+        subscribe_data_type: ['trade'],
+        subscribe_filter_asset_id: ["BTC/USDT", "ETH/USDT"],
+        subscribe_filter_symbol_id: ["COINBASE", "BINANCEUAT"]
     };
+    const test = {
+        "type": "hello",
+        "apikey": "9FA323AE-5E94-4087-9AF4-EBBA6326297C",
+        "heartbeat": false,
+        "subscribe_data_type": ["trade"],
+        "subscribe_filter_asset_id": ["BTC/USDT", "ETH/USDT"],
+        "subscribe_filter_symbol_id": ["COINBASE", "BINANCEUAT"]
+    }
+    
+    const wsCoinAPI = createWebSocket()
     wsCoinAPI.on('open', function open() {
-        // wsCoinAPI.send(JSON.stringify(exampleCall));
+        console.log("New connection to wsCoinAPI")
+        wsCoinAPI.send(JSON.stringify(exampleCall));
     });
 
     wsCoinAPI.on('message', function incoming(data) {
-        // marketRes.qoute(socket, JSON.parse(data.toString()))
-        // console.log('data wsCoinAPI', JSON.parse(data.toString()));
+        const parseData = JSON.parse(data.toString())
+        const [exchange, type_trade, trade_currency, ref_currency] = parseData.symbol_id.split('_')
+        const { checkSubMap } = SubcriberManagerInstance
+        const isCheckSubPass = checkSubMap(socket.id, `${trade_currency}/${ref_currency}`, exchange, type_trade)
+        if (isCheckSubPass) {
+            marketRes.qoute(socket, parseData)
+            console.log('match data wsCoinAPI >>>>>>>>>>>>>', parseData, socket.id);
+        } else {
+            console.log("dont match: ", data.toString(), socket.id);
+        }
     });
 
 });
