@@ -1,3 +1,4 @@
+import logger from './logger';
 /**
  * Web server port
  */
@@ -39,8 +40,8 @@ const PRIVATE_KEY_PATH = '/opt/psa/var/modules/letsencrypt/etc/live/YOUR-DOMAIN-
 const CERTIFICATE_PATH = '/opt/psa/var/modules/letsencrypt/etc/live/YOUR-DOMAIN-NAME.com/cert.pem';
 const CA_PATH = '/opt/psa/var/modules/letsencrypt/etc/live/YOUR-DOMAIN-NAME.com/chain.pem';
 
-const COINAPI_KEY = '9FA323AE-5E94-4087-9AF4-EBBA6326297C'
-
+const COINAPI_KEY = process.env.ENV === 'dev' ? '5916EF4A-BBD8-4583-9B2C-D7385AAA99CB' : '9FA323AE-5E94-4087-9AF4-EBBA6326297C'
+logger.debug(`[DEBUG] - ENV variable: ${JSON.stringify(process.env)}`)
 /**
  * Swagger UI settings
  * ------------------------

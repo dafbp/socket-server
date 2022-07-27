@@ -30,7 +30,7 @@ class SubcriberManager {
         }
         this.checkSubMap = (socket_id: string | null, symbol: ISymbolList, exchange: IExchangeList, trade_type: ITradeTypeList): boolean => {
             const userSubInfo = this.subMap[socket_id || 'default']
-            console.log("userSubInfo", userSubInfo, { socket_id, symbol, exchange, trade_type, matchSym: userSubInfo.symbol.includes(symbol), matchExch: userSubInfo.exchange.includes(exchange), matchTradeType: userSubInfo.trade_type.includes(trade_type) });
+            // console.log("userSubInfo", userSubInfo, { socket_id, symbol, exchange, trade_type, matchSym: userSubInfo.symbol.includes(symbol), matchExch: userSubInfo.exchange.includes(exchange), matchTradeType: userSubInfo.trade_type.includes(trade_type) });
 
             if (!userSubInfo.symbol.includes(symbol) || !userSubInfo.exchange.includes(exchange) || !userSubInfo.trade_type.includes(trade_type)) {
                 return false

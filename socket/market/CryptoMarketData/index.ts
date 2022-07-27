@@ -58,10 +58,10 @@ export const startListenCryptoMarketData = () => {
 
     });
     wsCoinAPI.on('error', (error) => {
-        logger.error('wsCoinAPI error', error)
+        logger.error(`wsCoinAPI error ${JSON.stringify(error)}`)
     })
     wsCoinAPI.on('close', (close) => {
-        logger.error('wsCoinAPI close', close)
+        logger.error(`wsCoinAPI close ${JSON.stringify(close)}`)
     })
 }
 export default {}

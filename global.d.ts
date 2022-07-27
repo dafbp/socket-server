@@ -22,7 +22,7 @@ declare global {
     }
     
     interface IMarketRes {
-        type: 'qoute';
+        type: 'qoute' | 'trade';
         data: any
     }
 

@@ -160,7 +160,7 @@ io.on('connection', function (socket) {
 
         const isCheckSubPass = checkSubMap(socket.id, `${trade_currency}/${ref_currency}`, exchange, type_trade)
         if (isCheckSubPass) {
-            marketRes.qoute(socket, parseData)
+            marketRes.trade(socket, parseData)
             // console.log('match data wsCoinAPI >>>>>>>>>>>>>', parseData, socket.id);
         } else {
             // console.log("dont match: ", socket.id);
