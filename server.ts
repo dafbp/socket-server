@@ -26,9 +26,9 @@ app.use(
         // origin: "http://localhost:3000",
         origin: function (origin, callback) {
             console.log("origin function", origin, callback);
-            
-                return callback(null, true)
-            },
+
+            return callback(null, true)
+        },
         // origin: "*",
         optionsSuccessStatus: 200,
         credentials: true
@@ -47,6 +47,12 @@ app.use(
  */
 import routesConfig from './routes/api';
 import { methodRes } from './socket/utilities/methodRes';
+import { startListenCryptoMarketData } from './socket/market/CryptoMarketData/index';
+import { marketRes } from './socket/utilities/marketRes';
+import SubcriberManagerInstance from './socket/market/index';
+import EventInternalInstance from './socket/event';
+import logger from './logger';
+
 app.use('/api', routesConfig);
 
 /**
@@ -79,18 +85,23 @@ httpServer.listen(srvConfig.SERVER_PORT, () => {
         useNewUrlParser: true,
         useUnifiedTopology: true
     }, (error: any) => {
-        console.log("error connect db", error);
-        
+        logger.error("error connect db", error);
+
         console.log(`Server started on port ${srvConfig.SERVER_PORT}`);
     });
 });
+
+/**
+ * const wsCoinAPI = createWebSocket()
+ */
 
 /**
  * Socket.io section
  */
 const io = require('socket.io')(httpServer);
 io.on('connection', function (socket) {
-    console.log(`New connection: ${socket.id}`);
+    logger.info(`New connection: ${socket.id}`, { socket_ip: socket.id });
+    SubcriberManagerInstance.createSubMapPerUser(socket.id)
     // send a message to the client
     socket.emit('hello', 'Hello!', { mr: 'john' }, Uint8Array.from([1, 2, 3, 4]));
 
@@ -137,15 +148,32 @@ io.on('connection', function (socket) {
         } else {
             socket.emit('method-response', { type: 'error', message: "Method sai" })
         }
-        console.log('method', req);
+        logger.info('method', req);
     });
 
     socket.on('message', data => {
         console.log('message', data);
     });
+    const subcriber = EventInternalInstance.publiser.subscribe(({ type, data: parseData }) => {
+        const [exchange, type_trade, trade_currency, ref_currency] = parseData.symbol_id.split('_')
+        const { checkSubMap } = SubcriberManagerInstance
 
-    socket.on('disconnect', () => console.log(`Connection left (${socket.id})`));
+        const isCheckSubPass = checkSubMap(socket.id, `${trade_currency}/${ref_currency}`, exchange, type_trade)
+        if (isCheckSubPass) {
+            marketRes.trade(socket, parseData)
+            // console.log('match data wsCoinAPI >>>>>>>>>>>>>', parseData, socket.id);
+        } else {
+            // console.log("dont match: ", socket.id);
+        }
+    })
+
+    socket.on('disconnect', () => {
+        logger.error(`Connection left (${socket.id})`)
+        // subcriber.unsubcribe()
+    });
 });
+
+startListenCryptoMarketData()
 
 const validateRequest = (socket, data, methodConfigABI) => {
     if (methodConfigABI?.input?.length !== data?.length) {

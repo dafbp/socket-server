@@ -1,7 +1,9 @@
+import logger from './logger';
 /**
  * Web server port
  */
 const SERVER_PORT = 3005;
+const AWS_SERVER_ADDRESS = 'http://ec2-18-136-105-202.ap-southeast-1.compute.amazonaws.com'
 
 /**
  * Session settings
@@ -38,6 +40,8 @@ const PRIVATE_KEY_PATH = '/opt/psa/var/modules/letsencrypt/etc/live/YOUR-DOMAIN-
 const CERTIFICATE_PATH = '/opt/psa/var/modules/letsencrypt/etc/live/YOUR-DOMAIN-NAME.com/cert.pem';
 const CA_PATH = '/opt/psa/var/modules/letsencrypt/etc/live/YOUR-DOMAIN-NAME.com/chain.pem';
 
+const COINAPI_KEY = process.env.ENV === 'dev' ? '5916EF4A-BBD8-4583-9B2C-D7385AAA99CB' : '9FA323AE-5E94-4087-9AF4-EBBA6326297C'
+logger.debug(`[DEBUG] - ENV variable: ${JSON.stringify(process.env)}`)
 /**
  * Swagger UI settings
  * ------------------------
@@ -78,5 +82,7 @@ export default {
     PRIVATE_KEY_PATH,
     CERTIFICATE_PATH,
     CA_PATH,
+    COINAPI_KEY,
+    AWS_SERVER_ADDRESS,
     SWAGGER_SETTINGS
 };

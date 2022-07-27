@@ -1,5 +1,10 @@
 # Created by .ignore support plugin (hsz.mobi)
 node_modules
 dist
+# Log files
+*.log
+**/*.log
+**/logs
+logs/
 
 **/node_modules

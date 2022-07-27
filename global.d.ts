@@ -20,6 +20,11 @@ declare global {
         message: string,
         type?: 'private' | 'success' | 'error',
     }
+    
+    interface IMarketRes {
+        type: 'qoute' | 'trade';
+        data: any
+    }
 
 }
 export { };

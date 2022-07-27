@@ -26,7 +26,8 @@ class SocketRealTimeAPI {
             timeout: 2000,
             secure: true,
             reconnection: false,
-            transports: ['websocket']
+            transports: ['websocket'],
+            // transports: ['polling'],
         }
         this.socket = io(SOCKET_SERVER, options)
         if (this.socket !== null) {
@@ -94,6 +95,9 @@ class SocketRealTimeAPI {
         this.socket.on(RES_CHANELS.method_response, (msg: IResMsg) => {
             console.log("response message", msg);
             
+        })
+        this.socket.on(RES_CHANELS.market_data, (data) => {
+            console.log(`${RES_CHANELS.market_data}: `, data)
         })
     }
 }
