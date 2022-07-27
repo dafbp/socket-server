@@ -39,7 +39,7 @@ class SubcriberManager {
         }
         this.createSubMapPerUser = (socket_id: string) => {
             this.subMap[socket_id] = {
-                symbol: ['BTC/USDT'],
+                symbol: ['BTC/USDT', 'ETH/USDT'],
                 exchange: ['BINANCEUAT', 'COINBASE'],
                 trade_type: ['SPOT']
             }

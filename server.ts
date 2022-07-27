@@ -160,7 +160,15 @@ io.on('connection', function (socket) {
 
         const isCheckSubPass = checkSubMap(socket.id, `${trade_currency}/${ref_currency}`, exchange, type_trade)
         if (isCheckSubPass) {
-            marketRes.trade(socket, parseData)
+            if (parseData.type === 'trade') {
+                marketRes.trade(socket, parseData)
+            } else if (parseData.type === 'qoute') {
+                marketRes.qoute(socket, parseData)
+            } else if (parseData.type === 'ohlcv') {
+                // Dữ liệu trần sàn tham chiếu: 
+                marketRes.qoute(socket, parseData)
+            } else {}
+
             // console.log('match data wsCoinAPI >>>>>>>>>>>>>', parseData, socket.id);
         } else {
             // console.log("dont match: ", socket.id);

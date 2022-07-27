@@ -9,7 +9,7 @@ const websocketDomain = "wss://ws-sandbox.coinapi.io/v1/"
 
 export const createWebSocket = () => {
     const ws = new WebSocket(websocketDomain);
-    logger.info(`createWebSocket >>>>>> ${ws._url}`)
+    logger.info(`createWebSocket >>>>>> ${ws._url} api_key: ${svrConfig.COINAPI_KEY} env: ${process.env.ENV}`)
     return ws
 }
 
@@ -19,17 +19,19 @@ export const startListenCryptoMarketData = () => {
         type: 'hello',
         apikey: svrConfig.COINAPI_KEY,
         heartbeat: false,
-        subscribe_data_type: ['trade'],
+        subscribe_data_type: ['trade', 'ohlcv'],
         subscribe_filter_asset_id: ["BTC/USDT", "ETH/USDT"],
-        subscribe_filter_symbol_id: ["COINBASE", "BINANCEUAT"]
+        subscribe_filter_symbol_id: ["COINBASE", "BINANCEUAT"],
+        subscribe_filter_period_id: ["1DAY"]
     };
     const test = {
         "type": "hello",
-        "apikey": "9FA323AE-5E94-4087-9AF4-EBBA6326297C",
+        "apikey": "5916EF4A-BBD8-4583-9B2C-D7385AAA99CB",
         "heartbeat": false,
-        "subscribe_data_type": ["trade"],
+        "subscribe_data_type": ["trade", "ohlcv"],
         "subscribe_filter_asset_id": ["BTC/USDT", "ETH/USDT"],
-        "subscribe_filter_symbol_id": ["COINBASE", "BINANCEUAT"]
+        "subscribe_filter_symbol_id": ["COINBASE", "BINANCEUAT"],
+        "subscribe_filter_period_id": ["1DAY"]
     }
 
     const wsCoinAPI = createWebSocket()
