@@ -5,19 +5,14 @@ interface ISubMap {
 }
 
 export interface ISubMapDetail {
-    symbol: ISymbolList[]
-    exchange: IExchangeList[]
-    trade_type: ITradeTypeList[]
+    symbol: ISymbolSupport[]
+    exchange: IExchangeSupport[]
+    trade_type: ITopicTradeSupport[]
 }
-
-export type ISymbolList = `${string}/${string}` | 'BTC/USDT' | 'ETH/USDT'
-export type IExchangeList = 'BINANCEUAT' | 'COINBASE'
-export type ITradeTypeList = 'SPOT'
-
 
 class SubcriberManager {
     subMap: ISubMap
-    checkSubMap: (socket_id: string | null, symbol: ISymbolList, exchange: IExchangeList, trade_type: ITradeTypeList) => boolean
+    checkSubMap: (socket_id: string | null, symbol: ISymbolSupport, exchange: IExchangeSupport, trade_type: ITopicTradeSupport) => boolean
     createSubMapPerUser: (socket_id: string) => void
     // -------
     constructor() {
@@ -28,7 +23,7 @@ class SubcriberManager {
                 trade_type: ['SPOT']
             }
         }
-        this.checkSubMap = (socket_id: string | null, symbol: ISymbolList, exchange: IExchangeList, trade_type: ITradeTypeList): boolean => {
+        this.checkSubMap = (socket_id: string | null, symbol: ISymbolSupport, exchange: IExchangeSupport, trade_type: ITopicTradeSupport): boolean => {
             const userSubInfo = this.subMap[socket_id || 'default']
             // console.log("userSubInfo", userSubInfo, { socket_id, symbol, exchange, trade_type, matchSym: userSubInfo.symbol.includes(symbol), matchExch: userSubInfo.exchange.includes(exchange), matchTradeType: userSubInfo.trade_type.includes(trade_type) });
 

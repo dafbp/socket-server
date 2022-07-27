@@ -154,6 +154,17 @@ io.on('connection', function (socket) {
     socket.on('message', data => {
         console.log('message', data);
     });
+
+    socket.on('sub', (subInfo: ISubReq) => {
+        console.log('sub', subInfo);
+        socket.emit('sub-response', { type: 'success', message: "Sub thành công ", info: subInfo, id: subInfo.id })
+        
+    });
+    socket.on('unsub', (unsubInfo: ISubReq) => {
+        console.log('unsub', unsubInfo);
+        socket.emit('unsub-response', { type: 'success', message: "Sub thành công ", info: unsubInfo, id: unsubInfo.id })
+    });
+
     const subcriber = EventInternalInstance.publiser.subscribe(({ type, data: parseData }) => {
         const [exchange, type_trade, trade_currency, ref_currency] = parseData.symbol_id.split('_')
         const { checkSubMap } = SubcriberManagerInstance
@@ -161,6 +172,7 @@ io.on('connection', function (socket) {
         const isCheckSubPass = checkSubMap(socket.id, `${trade_currency}/${ref_currency}`, exchange, type_trade)
         if (isCheckSubPass) {
             if (parseData.type === 'trade') {
+                // -- Giữ liệu giá thị trường Realtime 
                 marketRes.trade(socket, parseData)
             } else if (parseData.type === 'qoute') {
                 marketRes.qoute(socket, parseData)

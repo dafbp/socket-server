@@ -26,5 +26,17 @@ declare global {
         data: any
     }
 
+    type ISymbolSupport = `${string}/${string}` | 'BTC/USDT' | 'ETH/USDT'
+    type IExchangeSupport = 'BINANCEUAT' | 'COINBASE'
+    type ITopicTradeSupport = 'SPOT'
+
+    interface ISubReq {
+        method: 'sub' | 'unsub';
+        id: number,
+        exchange: IExchangeSupport[]
+        topic: ITopicTradeSupport[]
+        value: ISymbolSupport[]
+    }
+
 }
 export { };
