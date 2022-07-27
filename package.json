@@ -4,8 +4,10 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "compile": "export ENV=dev && tsc && node --experimental-modules --es-module-specifier-resolution=node dist/server.js",
-    "dev": "nodemon -e ts  --exec \"yarn compile\"",
+    "compile:dev": "export ENV=dev && tsc && node --experimental-modules --es-module-specifier-resolution=node dist/server.js",
+    "dev": "nodemon -e ts  --exec \"yarn compile:dev\"",
+    "compile:pro": "export ENV=pro && tsc",
+    "start:pro": "node --experimental-modules --es-module-specifier-resolution=node dist/server.js",
     "dumb:db": "node seed.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
