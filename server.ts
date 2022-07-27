@@ -49,7 +49,7 @@ import routesConfig from './routes/api';
 import { methodRes } from './socket/utilities/methodRes';
 import { startListenCryptoMarketData } from './socket/market/CryptoMarketData/index';
 import { marketRes } from './socket/utilities/marketRes';
-import SubcriberManagerInstance from './socket/market/index';
+// import SubcriberManagerInstance from './socket/market/index';
 import EventInternalInstance from './socket/event';
 import logger from './logger';
 
@@ -102,8 +102,16 @@ const io = require('socket.io')(httpServer);
 io.on('connection', function (socket) {
     logger.info(`New connection: ${socket.id}`, { socket_ip: socket.id });
     // console.log("list socket: io.sockets", io.sockets.size, io.sockets);
+    // ---- join room by default
+    const needJoin = [
+        "BINANCEUAT_SPOT_BTC_USDT",
+        "BINANCEUAT_SPOT_ETH_USDT",
+        "COINBASE_SPOT_BTC_USDT",
+        "COINBASE_SPOT_ETH_USDT",
+    ]
+    needJoin.forEach((room) => socket.join(room))
     
-    SubcriberManagerInstance.createSubMapPerUser(socket.id)
+    // SubcriberManagerInstance.createSubMapPerUser(socket.id)
     // -------- Method and service call
     socket.on('method', (req: IReqMethodCall) => {
         if (req.method === 'abi' && socketABIMethod[req.method]) {
@@ -168,10 +176,6 @@ io.on('connection', function (socket) {
                     "BINANCEUAT_SPOT_ETH_USDT", 
                     "COINBASE_SPOT_BTC_USDT", 
                     "COINBASE_SPOT_ETH_USDT", 
-                    // "ohlcv_BINANCEUAT_SPOT_BTC_USDT", 
-                    // "ohlcv_BINANCEUAT_SPOT_ETH_USDT", 
-                    // "ohlcv_COINBASE_SPOT_BTC_USDT", 
-                    // "ohlcv_COINBASE_SPOT_ETH_USDT"
                 ]
                 needJoin.forEach((room) => socket.join(room))
                 // -------
@@ -194,10 +198,6 @@ io.on('connection', function (socket) {
                     "BINANCEUAT_SPOT_ETH_USDT",
                     "COINBASE_SPOT_BTC_USDT",
                     "COINBASE_SPOT_ETH_USDT",
-                    // "ohlcv_BINANCEUAT_SPOT_BTC_USDT",
-                    // "ohlcv_BINANCEUAT_SPOT_ETH_USDT",
-                    // "ohlcv_COINBASE_SPOT_BTC_USDT",
-                    // "ohlcv_COINBASE_SPOT_ETH_USDT"
                 ]
                 needJoin.forEach((room) => socket.leave(room))
             }
