@@ -12,3 +12,7 @@ export const RES_CHANELS = {
     method_response: "method-response",
     market_data: "market-data"
 }
+
+export const MARKET_EVENT = {
+    update_data: "update_data"
+}

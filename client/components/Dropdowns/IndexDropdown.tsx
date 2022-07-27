@@ -43,7 +43,17 @@ const IndexDropdown = () => {
         >
           Admin Layout
         </span>
-        <Link href="/admin/dashboard">
+        <Link href="/market/market">
+          <a
+            href="#pablo"
+            className={
+              "text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-blueGray-700"
+            }
+          >
+            Market Board
+          </a>
+        </Link>
+        {/* <Link href="/admin/dashboard">
           <a
             href="#pablo"
             className={
@@ -82,7 +92,7 @@ const IndexDropdown = () => {
           >
             Maps
           </a>
-        </Link>
+        </Link> */}
         <div className="h-0 mx-4 my-2 border border-solid border-blueGray-100" />
         <span
           className={

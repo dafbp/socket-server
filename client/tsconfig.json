@@ -25,7 +25,8 @@
     "noEmit": true,
     "maxNodeModuleJsDepth": 2,
     "jsx": "preserve",
-    "baseUrl": "."
+    "baseUrl": ".",
+    "incremental": true
   },
   "typeRoots": [
     "./node_modules/@types",

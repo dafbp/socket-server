@@ -1,21 +1,23 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { socketAPI } from '../../api';
+import Market from '../market/market';
 
 // layout for page
 
 import Auth from 'layouts/Auth';
 
 export default function Login() {
+
     useEffect(() => {}, []);
 
     const onLogin = () => {
         console.log('socketAPI.methodCall');
 
-        socketAPI.methodCall({
-            method: 'auth',
-            params: ['username', 'password'],
-        });
+        // socketAPI.methodCall({
+        //     method: 'auth',
+        //     params: ['username', 'password'],
+        // });
     };
 
     return (
@@ -94,6 +96,9 @@ export default function Login() {
                                             type='button'>
                                             Sign In
                                         </button>
+                                    </div>
+                                    <div className='text-center mt-6'>
+                                        <Market/>
                                     </div>
                                 </form>
                             </div>

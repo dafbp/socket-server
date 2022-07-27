@@ -1,5 +1,6 @@
 import { io, Socket } from 'socket.io-client'
-import { REQ_CHANELS, SOCKET_SERVER, RES_CHANELS } from '../constants/socketConfig';
+import { REQ_CHANELS, SOCKET_SERVER, RES_CHANELS, MARKET_EVENT } from '../constants/socketConfig'
+import glb_sv from 'global_service/index'
 
 type SocketClient = null | Socket
 
@@ -93,11 +94,11 @@ class SocketRealTimeAPI {
         console.log("_listenMainEvent >>>>>>>>>>");
         
         this.socket.on(RES_CHANELS.method_response, (msg: IResMsg) => {
-            console.log("response message", msg);
-            
+            // console.log("response message", msg);
         })
         this.socket.on(RES_CHANELS.market_data, (data) => {
-            console.log(`${RES_CHANELS.market_data}: `, data)
+            glb_sv.eventMarket.next({type: MARKET_EVENT.update_data, data})
+            // console.log(`${RES_CHANELS.market_data}: `, data)
         })
     }
 }
