@@ -2,6 +2,7 @@
  * Web server port
  */
 const SERVER_PORT = 3005;
+const AWS_SERVER_ADDRESS = 'http://ec2-18-136-105-202.ap-southeast-1.compute.amazonaws.com'
 
 /**
  * Session settings
@@ -37,6 +38,8 @@ const HTTPS_ENABLED = false;
 const PRIVATE_KEY_PATH = '/opt/psa/var/modules/letsencrypt/etc/live/YOUR-DOMAIN-NAME.com/privkey.pem';
 const CERTIFICATE_PATH = '/opt/psa/var/modules/letsencrypt/etc/live/YOUR-DOMAIN-NAME.com/cert.pem';
 const CA_PATH = '/opt/psa/var/modules/letsencrypt/etc/live/YOUR-DOMAIN-NAME.com/chain.pem';
+
+const COINAPI_KEY = '9FA323AE-5E94-4087-9AF4-EBBA6326297C'
 
 /**
  * Swagger UI settings
@@ -78,5 +81,7 @@ export default {
     PRIVATE_KEY_PATH,
     CERTIFICATE_PATH,
     CA_PATH,
+    COINAPI_KEY,
+    AWS_SERVER_ADDRESS,
     SWAGGER_SETTINGS
 };

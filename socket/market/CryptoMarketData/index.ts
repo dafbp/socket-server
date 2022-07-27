@@ -2,12 +2,14 @@ import { marketRes } from '../../../socket/utilities/marketRes';
 import WebSocket from 'ws'
 import SubcriberManagerInstance from '../index';
 import EventInternalInstance from '../../event/index';
+import svrConfig from '../../../config'
+import logger from '../../../logger'
 
 const websocketDomain = "wss://ws-sandbox.coinapi.io/v1/"
 
 export const createWebSocket = () => {
     const ws = new WebSocket(websocketDomain);
-    console.log("createWebSocket >>>>>> ", ws._url);
+    logger.info(`createWebSocket >>>>>> ${ws._url}`)
     return ws
 }
 
@@ -15,7 +17,7 @@ export const startListenCryptoMarketData = () => {
     // -------
     const exampleCall = {
         type: 'hello',
-        apikey: '9FA323AE-5E94-4087-9AF4-EBBA6326297C',
+        apikey: svrConfig.COINAPI_KEY,
         heartbeat: false,
         subscribe_data_type: ['trade'],
         subscribe_filter_asset_id: ["BTC/USDT", "ETH/USDT"],
@@ -32,11 +34,13 @@ export const startListenCryptoMarketData = () => {
 
     const wsCoinAPI = createWebSocket()
     wsCoinAPI.on('open', function open() {
-        console.log("New connection to wsCoinAPI")
+        logger.info(`New connection to wsCoinAPI`)
         wsCoinAPI.send(JSON.stringify(exampleCall));
     });
 
     wsCoinAPI.on('message', function incoming(data) {
+        // console.log("message", data);
+        
         const parseData = JSON.parse(data.toString())
         EventInternalInstance.publiser.next({ type: 'rx-market', data: parseData })
 
@@ -53,5 +57,11 @@ export const startListenCryptoMarketData = () => {
 
 
     });
+    wsCoinAPI.on('error', (error) => {
+        logger.error('wsCoinAPI error', error)
+    })
+    wsCoinAPI.on('close', (close) => {
+        logger.error('wsCoinAPI close', close)
+    })
 }
 export default {}

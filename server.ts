@@ -51,6 +51,7 @@ import { startListenCryptoMarketData } from './socket/market/CryptoMarketData/in
 import { marketRes } from './socket/utilities/marketRes';
 import SubcriberManagerInstance from './socket/market/index';
 import EventInternalInstance from './socket/event';
+import logger from './logger';
 
 app.use('/api', routesConfig);
 
@@ -84,7 +85,7 @@ httpServer.listen(srvConfig.SERVER_PORT, () => {
         useNewUrlParser: true,
         useUnifiedTopology: true
     }, (error: any) => {
-        console.log("error connect db", error);
+        logger.error("error connect db", error);
 
         console.log(`Server started on port ${srvConfig.SERVER_PORT}`);
     });
@@ -99,7 +100,7 @@ httpServer.listen(srvConfig.SERVER_PORT, () => {
  */
 const io = require('socket.io')(httpServer);
 io.on('connection', function (socket) {
-    console.log(`New connection: ${socket.id}`);
+    logger.info(`New connection: ${socket.id}`, { socket_ip: socket.id });
     SubcriberManagerInstance.createSubMapPerUser(socket.id)
     // send a message to the client
     socket.emit('hello', 'Hello!', { mr: 'john' }, Uint8Array.from([1, 2, 3, 4]));
@@ -147,7 +148,7 @@ io.on('connection', function (socket) {
         } else {
             socket.emit('method-response', { type: 'error', message: "Method sai" })
         }
-        console.log('method', req);
+        logger.info('method', req);
     });
 
     socket.on('message', data => {
@@ -167,7 +168,7 @@ io.on('connection', function (socket) {
     })
 
     socket.on('disconnect', () => {
-        console.log(`Connection left (${socket.id})`)
+        logger.error(`Connection left (${socket.id})`)
         subcriber.unsubcribe()
     });
 });
