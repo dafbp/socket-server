@@ -166,7 +166,7 @@ io.on('connection', function (socket) {
                 marketRes.qoute(socket, parseData)
             } else if (parseData.type === 'ohlcv') {
                 // Dữ liệu trần sàn tham chiếu: 
-                marketRes.qoute(socket, parseData)
+                marketRes.ohlcv(socket, parseData)
             } else {}
 
             // console.log('match data wsCoinAPI >>>>>>>>>>>>>', parseData, socket.id);

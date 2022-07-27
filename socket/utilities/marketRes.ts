@@ -19,7 +19,7 @@ export const marketRes = {
     ohlcv: (socket, result: any) => {
         const verifyResult: IMarketRes = {
             data: result,
-            type: 'trade',
+            type: 'ohlcv',
         }
 
         socket.emit('market-data', verifyResult);
