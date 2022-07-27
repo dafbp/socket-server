@@ -169,7 +169,7 @@ io.on('connection', function (socket) {
 
     socket.on('disconnect', () => {
         logger.error(`Connection left (${socket.id})`)
-        subcriber.unsubcribe()
+        // subcriber.unsubcribe()
     });
 });
 
