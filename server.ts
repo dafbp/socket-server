@@ -157,12 +157,28 @@ io.on('connection', function (socket) {
 
     socket.on('sub', (subInfo: ISubReq) => {
         console.log('sub', subInfo);
-        socket.emit('sub-response', { type: 'success', message: "Sub thành công ", info: subInfo, id: subInfo.id })
+        if (subInfo.method === 'sub') {
+            if (typeof subInfo.id !== 'number') {
+                socket.emit('sub-response', { type: 'error', message: "Sub thất bại: Thiếu id ", info: subInfo, id: subInfo.id })
+            } else {
+                socket.emit('sub-response', { type: 'success', message: "Sub thành công ", info: subInfo, id: subInfo.id })
+            }
+        } else {
+            socket.emit('sub-response', { type: 'error', message: "Sub thất bại: Sai method ", info: subInfo, id: subInfo.id })
+        }
         
     });
     socket.on('unsub', (unsubInfo: ISubReq) => {
         console.log('unsub', unsubInfo);
-        socket.emit('unsub-response', { type: 'success', message: "Sub thành công ", info: unsubInfo, id: unsubInfo.id })
+        if (unsubInfo.method === 'unsub') {
+            if (typeof unsubInfo.id !== 'number') {
+                socket.emit('unsub-response', { type: 'error', message: "unsub thất bại: thiếu id ", info: unsubInfo, id: unsubInfo.id })
+            } else {
+                socket.emit('unsub-response', { type: 'success', message: "unsub thành công ", info: unsubInfo, id: unsubInfo.id })
+            }
+        } else {
+            socket.emit('unsub-response', { type: 'error', message: "unsub thất bại: Sai method ", info: unsubInfo, id: unsubInfo.id })
+        }
     });
 
     const subcriber = EventInternalInstance.publiser.subscribe(({ type, data: parseData }) => {
