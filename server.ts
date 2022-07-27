@@ -101,10 +101,10 @@ httpServer.listen(srvConfig.SERVER_PORT, () => {
 const io = require('socket.io')(httpServer);
 io.on('connection', function (socket) {
     logger.info(`New connection: ${socket.id}`, { socket_ip: socket.id });
+    // console.log("list socket: io.sockets", io.sockets.size, io.sockets);
+    
     SubcriberManagerInstance.createSubMapPerUser(socket.id)
-    // send a message to the client
-    socket.emit('hello', 'Hello!', { mr: 'john' }, Uint8Array.from([1, 2, 3, 4]));
-
+    // -------- Method and service call
     socket.on('method', (req: IReqMethodCall) => {
         if (req.method === 'abi' && socketABIMethod[req.method]) {
             if (req.params[0] === 'all') {
@@ -162,6 +162,19 @@ io.on('connection', function (socket) {
                 socket.emit('sub-response', { type: 'error', message: "Sub thất bại: Thiếu id ", info: subInfo, id: subInfo.id })
             } else {
                 socket.emit('sub-response', { type: 'success', message: "Sub thành công ", info: subInfo, id: subInfo.id })
+                // ---- join room test
+                const needJoin = [
+                    "BINANCEUAT_SPOT_BTC_USDT", 
+                    "BINANCEUAT_SPOT_ETH_USDT", 
+                    "COINBASE_SPOT_BTC_USDT", 
+                    "COINBASE_SPOT_ETH_USDT", 
+                    // "ohlcv_BINANCEUAT_SPOT_BTC_USDT", 
+                    // "ohlcv_BINANCEUAT_SPOT_ETH_USDT", 
+                    // "ohlcv_COINBASE_SPOT_BTC_USDT", 
+                    // "ohlcv_COINBASE_SPOT_ETH_USDT"
+                ]
+                needJoin.forEach((room) => socket.join(room))
+                // -------
             }
         } else {
             socket.emit('sub-response', { type: 'error', message: "Sub thất bại: Sai method ", info: subInfo, id: subInfo.id })
@@ -175,38 +188,101 @@ io.on('connection', function (socket) {
                 socket.emit('unsub-response', { type: 'error', message: "unsub thất bại: thiếu id ", info: unsubInfo, id: unsubInfo.id })
             } else {
                 socket.emit('unsub-response', { type: 'success', message: "unsub thành công ", info: unsubInfo, id: unsubInfo.id })
+                // ---- leave room test
+                const needJoin = [
+                    "BINANCEUAT_SPOT_BTC_USDT",
+                    "BINANCEUAT_SPOT_ETH_USDT",
+                    "COINBASE_SPOT_BTC_USDT",
+                    "COINBASE_SPOT_ETH_USDT",
+                    // "ohlcv_BINANCEUAT_SPOT_BTC_USDT",
+                    // "ohlcv_BINANCEUAT_SPOT_ETH_USDT",
+                    // "ohlcv_COINBASE_SPOT_BTC_USDT",
+                    // "ohlcv_COINBASE_SPOT_ETH_USDT"
+                ]
+                needJoin.forEach((room) => socket.leave(room))
             }
         } else {
             socket.emit('unsub-response', { type: 'error', message: "unsub thất bại: Sai method ", info: unsubInfo, id: unsubInfo.id })
         }
     });
 
-    const subcriber = EventInternalInstance.publiser.subscribe(({ type, data: parseData }) => {
-        const [exchange, type_trade, trade_currency, ref_currency] = parseData.symbol_id.split('_')
-        const { checkSubMap } = SubcriberManagerInstance
+    // const subcriber = EventInternalInstance.publiser.subscribe(({ type, data: parseData }) => {
+    //     const [exchange, type_trade, trade_currency, ref_currency] = parseData.symbol_id.split('_')
+    //     const { checkSubMap } = SubcriberManagerInstance
 
-        const isCheckSubPass = checkSubMap(socket.id, `${trade_currency}/${ref_currency}`, exchange, type_trade)
-        if (isCheckSubPass) {
-            if (parseData.type === 'trade') {
-                // -- Giữ liệu giá thị trường Realtime 
-                marketRes.trade(socket, parseData)
-            } else if (parseData.type === 'qoute') {
-                marketRes.qoute(socket, parseData)
-            } else if (parseData.type === 'ohlcv') {
-                // Dữ liệu trần sàn tham chiếu: 
-                marketRes.ohlcv(socket, parseData)
-            } else {}
+    //     const isCheckSubPass = checkSubMap(socket.id, `${trade_currency}/${ref_currency}`, exchange, type_trade)
+    //     if (isCheckSubPass) {
+    //         if (parseData.type === 'trade') {
+    //             // -- Giữ liệu giá thị trường Realtime 
+    //             marketRes.trade(socket, parseData)
+    //         } else if (parseData.type === 'qoute') {
+    //             marketRes.qoute(socket, parseData)
+    //         } else if (parseData.type === 'ohlcv') {
+    //             // Dữ liệu trần sàn tham chiếu: 
+    //             marketRes.ohlcv(socket, parseData)
+    //         } else {}
 
-            // console.log('match data wsCoinAPI >>>>>>>>>>>>>', parseData, socket.id);
-        } else {
-            // console.log("dont match: ", socket.id);
-        }
-    })
+    //         // console.log('match data wsCoinAPI >>>>>>>>>>>>>', parseData, socket.id);
+    //     } else {
+    //         // console.log("dont match: ", socket.id);
+    //     }
+    // })
 
     socket.on('disconnect', () => {
         logger.error(`Connection left (${socket.id})`)
         // subcriber.unsubcribe()
     });
+});
+
+const subcriber = EventInternalInstance.publiser.subscribe(({ type, data: parseData }) => {
+    const [exchange, type_trade, trade_currency, ref_currency] = parseData.symbol_id.split('_')
+    const { type: typeTopic }: { type: ITopicDataSupport} = parseData
+    
+    if (parseData.type === 'trade') {
+        // -- Giữ liệu giá thị trường Realtime
+        marketRes.trade(io.sockets, parseData, parseData.symbol_id)
+    } else if (parseData.type === 'qoute') {
+        marketRes.qoute(io.sockets, parseData, parseData.symbol_id)
+    } else if (parseData.type === 'ohlcv') {
+        // Dữ liệu trần sàn tham chiếu:
+        marketRes.ohlcv(io.sockets, parseData, parseData.symbol_id)
+    } else { }
+
+    // const { checkSubMap } = SubcriberManagerInstance
+
+    // const isCheckSubPass = checkSubMap(socket.id, `${trade_currency}/${ref_currency}`, exchange, type_trade)
+    // if (isCheckSubPass) {
+    //     if (parseData.type === 'trade') {
+    //         // -- Giữ liệu giá thị trường Realtime 
+    //         marketRes.trade(socket, parseData)
+    //     } else if (parseData.type === 'qoute') {
+    //         marketRes.qoute(socket, parseData)
+    //     } else if (parseData.type === 'ohlcv') {
+    //         // Dữ liệu trần sàn tham chiếu: 
+    //         marketRes.ohlcv(socket, parseData)
+    //     } else { }
+
+    //     // console.log('match data wsCoinAPI >>>>>>>>>>>>>', parseData, socket.id);
+    // } else {
+    //     // console.log("dont match: ", socket.id);
+    // }
+})
+
+
+io.of("/").adapter.on("create-room", (room) => {
+    console.log(`room ${room} was created`);
+});
+
+io.of("/").adapter.on("join-room", (room, id) => {
+    console.log(`socket ${id} has joined room ${room}`);
+});
+
+io.of("/").adapter.on("delete-room", (room) => {
+    console.log(`room ${room} was delete`);
+});
+
+io.of("/").adapter.on("leave-room", (room, id) => {
+    console.log(`socket ${id} has leave room ${room}`);
 });
 
 startListenCryptoMarketData()

@@ -29,13 +29,15 @@ declare global {
     type ISymbolSupport = `${string}/${string}` | 'BTC/USDT' | 'ETH/USDT'
     type IExchangeSupport = 'BINANCEUAT' | 'COINBASE'
     type ITopicTradeSupport = 'SPOT'
+    type ITopicDataSupport = 'trade' | 'volume' | 'ohlcv'
 
     interface ISubReq {
         method: 'sub' | 'unsub';
         id: number,
         exchange: IExchangeSupport[]
-        topic: ITopicTradeSupport[]
+        topic: ITopicDataSupport[]
         value: ISymbolSupport[]
+        trade_filter: ITopicTradeSupport[]
     }
 
 }
