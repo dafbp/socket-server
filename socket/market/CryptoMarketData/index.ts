@@ -5,10 +5,10 @@ import EventInternalInstance from '../../event/index';
 import svrConfig from '../../../config'
 import logger from '../../../logger'
 
-const websocketDomain = "wss://ws-sandbox.coinapi.io/v1/"
+const websocketDomain = ["wss://ws-sandbox.coinapi.io/v1/", "wss://ws.coinapi.io/v1/"]
 
 export const createWebSocket = () => {
-    const ws = new WebSocket(websocketDomain);
+    const ws = new WebSocket(websocketDomain[0]);
     logger.info(`createWebSocket >>>>>> ${ws._url} api_key: ${svrConfig.COINAPI_KEY} env: ${process.env.ENV}`)
     return ws
 }
@@ -21,7 +21,7 @@ export const startListenCryptoMarketData = () => {
         heartbeat: false,
         subscribe_data_type: ['trade', 'ohlcv'],
         subscribe_filter_asset_id: ["BTC/USDT", "ETH/USDT"],
-        subscribe_filter_symbol_id: ["COINBASE", "BINANCEUAT"],
+        subscribe_filter_symbol_id: ["COINBASE", "BINANCEUAT", "BINANCE", "FTX", "HOUBIPRO"],
         subscribe_filter_period_id: ["1DAY"]
     };
     const test = {
@@ -30,7 +30,7 @@ export const startListenCryptoMarketData = () => {
         "heartbeat": false,
         "subscribe_data_type": ["trade", "ohlcv"],
         "subscribe_filter_asset_id": ["BTC/USDT", "ETH/USDT"],
-        "subscribe_filter_symbol_id": ["COINBASE", "BINANCEUAT"],
+        "subscribe_filter_symbol_id": ["COINBASE", "BINANCEUAT", "BINANCE", "FTX", "HOUBIPRO"],
         "subscribe_filter_period_id": ["1DAY"]
     }
 
