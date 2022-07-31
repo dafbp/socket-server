@@ -98,18 +98,23 @@ httpServer.listen(srvConfig.SERVER_PORT, () => {
 /**
  * Socket.io section
  */
+
+const DEFAULT_ROOM_MARKET = [
+    "BINANCEUAT_SPOT_BTC_USDT",
+    "BINANCEUAT_SPOT_ETH_USDT",
+    "BINANCE_SPOT_BTC_USDT",
+    "BINANCE_SPOT_ETH_USDT",
+    "COINBASE_SPOT_BTC_USDT",
+    "COINBASE_SPOT_ETH_USDT",
+]
+
+
 const io = require('socket.io')(httpServer);
 io.on('connection', function (socket) {
     logger.info(`New connection: ${socket.id}`, { socket_ip: socket.id });
     // console.log("list socket: io.sockets", io.sockets.size, io.sockets);
     // ---- join room by default
-    const needJoin = [
-        "BINANCEUAT_SPOT_BTC_USDT",
-        "BINANCEUAT_SPOT_ETH_USDT",
-        "COINBASE_SPOT_BTC_USDT",
-        "COINBASE_SPOT_ETH_USDT",
-    ]
-    needJoin.forEach((room) => socket.join(room))
+    DEFAULT_ROOM_MARKET.forEach((room) => socket.join(room))
     
     // SubcriberManagerInstance.createSubMapPerUser(socket.id)
     // -------- Method and service call
@@ -171,13 +176,7 @@ io.on('connection', function (socket) {
             } else {
                 socket.emit('sub-response', { type: 'success', message: "Sub thành công ", info: subInfo, id: subInfo.id })
                 // ---- join room test
-                const needJoin = [
-                    "BINANCEUAT_SPOT_BTC_USDT", 
-                    "BINANCEUAT_SPOT_ETH_USDT", 
-                    "COINBASE_SPOT_BTC_USDT", 
-                    "COINBASE_SPOT_ETH_USDT", 
-                ]
-                needJoin.forEach((room) => socket.join(room))
+                DEFAULT_ROOM_MARKET.forEach((room) => socket.join(room))
                 // -------
             }
         } else {
@@ -193,13 +192,7 @@ io.on('connection', function (socket) {
             } else {
                 socket.emit('unsub-response', { type: 'success', message: "unsub thành công ", info: unsubInfo, id: unsubInfo.id })
                 // ---- leave room test
-                const needJoin = [
-                    "BINANCEUAT_SPOT_BTC_USDT",
-                    "BINANCEUAT_SPOT_ETH_USDT",
-                    "COINBASE_SPOT_BTC_USDT",
-                    "COINBASE_SPOT_ETH_USDT",
-                ]
-                needJoin.forEach((room) => socket.leave(room))
+                DEFAULT_ROOM_MARKET.forEach((room) => socket.leave(room))
             }
         } else {
             socket.emit('unsub-response', { type: 'error', message: "unsub thất bại: Sai method ", info: unsubInfo, id: unsubInfo.id })
