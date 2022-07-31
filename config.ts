@@ -2,8 +2,10 @@ import logger from './logger';
 /**
  * Web server port
  */
-const SERVER_PORT = 3005;
+const SERVER_PORT = 2022;
 const AWS_SERVER_ADDRESS = 'http://ec2-18-136-105-202.ap-southeast-1.compute.amazonaws.com'
+const IO_SOCKET_ADDRESS = 'http://io.nvdise.space'
+const RESTFUL_ADDRESS = 'http://api.nvdise.space'
 
 /**
  * Session settings
