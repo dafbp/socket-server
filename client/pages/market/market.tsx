@@ -18,17 +18,17 @@ export default function Market() {
     }, []);
 
     const handleMarketData = () => {
-        glb_sv.eventMarket.subscribe((msg) => {
-            if (msg.type === MARKET_EVENT.update_data) {
-                glb_sv.marketData = msg.data.data;
-                if (glb_sv.marketData.price > ref.current){
-                    setUpDown(true)
-                } else setUpDown(false)
-                ref.current = glb_sv.marketData.price
-                setPrice(glb_sv.marketData.price)
-                // console.log("data", price > ref.current)
-            }
-        })
+        // glb_sv.eventMarket.subscribe((msg) => {
+        //     if (msg.type === MARKET_EVENT.update_data) {
+        //         glb_sv.marketData = msg.data.data;
+        //         if (glb_sv.marketData.price > ref.current){
+        //             setUpDown(true)
+        //         } else setUpDown(false)
+        //         ref.current = glb_sv.marketData.price
+        //         setPrice(glb_sv.marketData.price)
+        //         console.log("data", price > ref.current)
+        //     }
+        // })
     }
 
     return (
