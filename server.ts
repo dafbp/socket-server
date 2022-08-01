@@ -81,7 +81,8 @@ if (srvConfig.HTTPS_ENABLED) {
  * Start http server & connect to MongoDB
  */
 httpServer.listen(srvConfig.SERVER_PORT, () => {
-    mongoose.connect(`${CONNECTION_TYPE}://${dbAuthString}${DB_HOST}:${DB_PORT}/${DB_NAME}${DB_QUERY_PARAMS}`, {
+    // mongoose.connect(`${CONNECTION_TYPE}://${encodeURIComponent(dbAuthString)}${DB_HOST}:${DB_PORT}/${DB_NAME}${DB_QUERY_PARAMS}`, {
+    mongoose.connect(`mongodb+srv://admin:admin123@cluster0.neny7az.mongodb.net/?retryWrites=true&w=majority`, {
         useNewUrlParser: true,
         useUnifiedTopology: true
     }, (error: any) => {
@@ -90,6 +91,8 @@ httpServer.listen(srvConfig.SERVER_PORT, () => {
         console.log(`Server started on port ${srvConfig.SERVER_PORT}`);
     });
 });
+// console.log("dbAuthString", dbAuthString, `${CONNECTION_TYPE}://${encodeURIComponent(dbAuthString)}${DB_HOST}:${DB_PORT}/${DB_NAME}${DB_QUERY_PARAMS}`);
+
 
 /**
  * const wsCoinAPI = createWebSocket()

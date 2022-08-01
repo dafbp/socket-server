@@ -20,13 +20,14 @@ const SESSION_SECRET = 'Z>lFs46=B)$u(742x5(iEH6k&m';
  *  - DB_QUERY_PARAMS is optional, but if you use cloud service like mongodb.com/cloud,
  *    then the following query params is recommend: '?retryWrites=true&w=majority'
  */
-const CONNECTION_TYPE = "mongodb";
+// const CONNECTION_TYPE = "mongodb"; // Local
+const CONNECTION_TYPE = "mongodb+srv"; // Cloud
 const DB_USERNAME = "admin";
 const DB_PASSWORD = "admin123";
-const DB_HOST = "localhost";
+const DB_HOST = "cluster0.neny7az.mongodb.net";
 const DB_PORT = "27017";
-const DB_NAME = "nvd-db";
-const DB_QUERY_PARAMS = "";
+const DB_NAME = "training";
+const DB_QUERY_PARAMS = "?retryWrites=true&w=majority";
 
 /**
  * SSL / HTTPS settings
