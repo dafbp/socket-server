@@ -1,27 +1,23 @@
 
 export const marketRes = {
-    qoute: (sockets, result: any, room: string) => {
-        const verifyResult: IMarketRes = {
-            data: result,
-            type: 'qoute',
+    qoute: (sockets, result: IMarketRes, room: string) => {
+        if (result.type !== 'qoute') {
+            return
         }
-        sockets.to(room).emit('market-data', verifyResult);
+        sockets.to(room).emit('market-data', result);
     },
-    trade: (sockets, result: any, room: string) => {
-        const verifyResult: IMarketRes = {
-            data: result,
-            type: 'trade',
+    trade: (sockets, result: IMarketRes, room: string) => {
+        if (result.type !== 'trade') {
+            return
         }
         
         // console.log("data trade", sockets, room);
-        sockets.to(room).emit('market-data', verifyResult);
+        sockets.to(room).emit('market-data', result);
     },
-    ohlcv: (sockets, result: any, room: string) => {
-        const verifyResult: IMarketRes = {
-            data: result,
-            type: 'ohlcv',
+    ohlcv: (sockets, result: IMarketRes, room: string) => {
+        if (result.type !== 'ohlcv') {
+            return
         }
-
-        sockets.to(room).emit('market-data', verifyResult);
+        sockets.to(room).emit('market-data', result);
     },
 }

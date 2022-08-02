@@ -105,6 +105,8 @@ authRouter.post('/login', function (req, res, next) {
  * @consumes application/json
  */
 authRouter.post('/register', async (req, res) => {
+    console.log("register", req);
+    
     let {name, username, password} = req.body;
 
     if (!name || !username || !password) return res.status(409).json({

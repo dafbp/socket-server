@@ -23,7 +23,7 @@ declare global {
     
     interface IMarketRes {
         type: 'qoute' | 'trade' | 'ohlcv';
-        data: any
+        [key: string]: string | number
     }
 
     type ISymbolSupport = `${string}/${string}` | 'BTC/USDT' | 'ETH/USDT'
