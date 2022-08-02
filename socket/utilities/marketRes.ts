@@ -10,9 +10,16 @@ export const marketRes = {
         if (result.type !== 'trade') {
             return
         }
-        
-        // console.log("data trade", sockets, room);
-        sockets.to(room).emit('market-data', result);
+        const verifyResult = {
+            time_exchange: result.time_exchange,
+            price: result.price,
+            size: result.size,
+            taker_side: result.taker_side,
+            symbol_id: result.symbol_id,
+            sequence: result.sequence,
+            type: result.type,
+        }
+        sockets.to(room).emit('market-data', verifyResult);
     },
     ohlcv: (sockets, result: IMarketRes, room: string) => {
         if (result.type !== 'ohlcv') {
