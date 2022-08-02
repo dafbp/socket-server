@@ -1,4 +1,7 @@
-
+/**
+ * TODO: Remove do không cần dùng tới nữa => Dùng socket io room
+ * 
+ */
 
 interface ISubMap {
     [userId: string]: ISubMapDetail

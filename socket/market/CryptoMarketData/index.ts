@@ -22,7 +22,7 @@ export const startListenCryptoMarketData = () => {
         subscribe_data_type: ['trade', 'ohlcv'],
         subscribe_filter_asset_id: ["BTC/USDT", "ETH/USDT"],
         subscribe_filter_symbol_id: ["COINBASE", "BINANCEUAT", "BINANCE", "FTX", "HOUBIPRO"],
-        subscribe_filter_period_id: ["1DAY"]
+        subscribe_filter_period_id: ["1DAY", "12HRS", "1HRS"]
     };
     const test = {
         "type": "hello",
