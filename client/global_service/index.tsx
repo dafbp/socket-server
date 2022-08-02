@@ -1,11 +1,12 @@
 import { Subject } from 'rxjs'
 
+
 class globalService {
     eventMarket: Subject<{}>
-    marketData: {}
+    marketData: IMarketDataModel
     constructor() {
         this.eventMarket = new Subject()
-        this.marketData = {}
+        this.marketData
     }
 }
 const glb_sv = new globalService()
