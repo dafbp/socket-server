@@ -16,7 +16,7 @@ export const marketRes = {
             size: result.size,
             taker_side: result.taker_side,
             symbol_id: result.symbol_id,
-            sequence: result.sequence,
+            // sequence: result.sequence,
             type: result.type,
         }
         sockets.to(room).emit('market-data', verifyResult);
@@ -25,6 +25,22 @@ export const marketRes = {
         if (result.type !== 'ohlcv') {
             return
         }
-        sockets.to(room).emit('market-data', result);
+        const verifyResult = {
+            period_id: result.period_id,
+            time_period_start: result.time_period_start,
+            time_period_end: result.time_period_end,
+            time_open: result.time_open,
+            time_close: result.time_close,
+            price_open: result.price_open,
+            price_high: result.price_high,
+            price_low: result.price_low,
+            price_close: result.price_close,
+            volume_traded: result.volume_traded,
+            trades_count: result.trades_count,
+            symbol_id: result.symbol_id,
+            // sequence: result.sequence,
+            type: result.type
+        }
+        sockets.to(room).emit('market-data', verifyResult);
     },
 }
