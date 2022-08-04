@@ -200,12 +200,17 @@ io.on('connection', function (socket) {
                 // ---- leave room
                 const symbol_ids = unsubInfo.symbol_ids || []
                 if (symbol_ids.length) {
-                    symbol_ids.forEach((room) => socket.join(room))
+                    symbol_ids.forEach((room) => socket.leave(room))
                 }
             }
         } else {
             socket.emit('unsub-response', { type: 'error', message: "unsub thất bại: Sai method ", info: unsubInfo, id: unsubInfo.id })
         }
+    });
+    socket.on('rooms', (rooms: any) => {
+        console.log(socket.rooms, );
+        
+        socket.emit('rooms-response', { type: 'success', message: "Get room ok!", results: Array.from(socket.rooms.values()) })
     });
 
     socket.on('disconnect', () => {
