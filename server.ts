@@ -82,11 +82,11 @@ if (srvConfig.HTTPS_ENABLED) {
  */
 httpServer.listen(srvConfig.SERVER_PORT, () => {
     // mongoose.connect(`${CONNECTION_TYPE}://${encodeURIComponent(dbAuthString)}${DB_HOST}:${DB_PORT}/${DB_NAME}${DB_QUERY_PARAMS}`, {
-    mongoose.connect(`mongodb+srv://admin:admin123@cluster0.neny7az.mongodb.net/?retryWrites=true&w=majority`, {
+    mongoose.connect(`mongodb+srv://admin:admin123@cluster0.neny7az.mongodb.net/${DB_NAME}?retryWrites=true&w=majority`, {
         useNewUrlParser: true,
         useUnifiedTopology: true
     }, (error: any) => {
-        logger.error("error connect db", error);
+        logger.error(`error connect db ${JSON.stringify(error)}`);
 
         console.log(`Server started on port ${srvConfig.SERVER_PORT}`);
     });
@@ -138,7 +138,7 @@ io.on('connection', function (socket) {
                     result: socketABIMethod[req.params[0]],
                 })
             }
-        } else if (req.method === 'auth' && socketABIMethod[req.method]) {
+        } else if (socketABIMethod[req.method]) {
             const { isValidatedRequest, messageError } = validateRequest(socket, req.params, socketABIMethod[req.method])
             // ---- 
             if (isValidatedRequest) {
@@ -229,40 +229,6 @@ io.on('connection', function (socket) {
         // subcriber.unsubcribe()
     });
 });
-
-const subcriber = EventInternalInstance.publiser.subscribe(({ type, data: parseData }) => {
-    const [exchange, type_trade, trade_currency, ref_currency] = parseData.symbol_id.split('_')
-    const { type: typeTopic }: { type: ITopicDataSupport} = parseData
-    
-    if (parseData.type === 'trade') {
-        // -- Giữ liệu giá thị trường Realtime
-        marketRes.trade(io.sockets, parseData, parseData.symbol_id)
-    } else if (parseData.type === 'qoute') {
-        marketRes.qoute(io.sockets, parseData, parseData.symbol_id)
-    } else if (parseData.type === 'ohlcv') {
-        // Dữ liệu trần sàn tham chiếu:
-        marketRes.ohlcv(io.sockets, parseData, parseData.symbol_id)
-    } else { }
-
-    // const { checkSubMap } = SubcriberManagerInstance
-
-    // const isCheckSubPass = checkSubMap(socket.id, `${trade_currency}/${ref_currency}`, exchange, type_trade)
-    // if (isCheckSubPass) {
-    //     if (parseData.type === 'trade') {
-    //         // -- Giữ liệu giá thị trường Realtime 
-    //         marketRes.trade(socket, parseData)
-    //     } else if (parseData.type === 'qoute') {
-    //         marketRes.qoute(socket, parseData)
-    //     } else if (parseData.type === 'ohlcv') {
-    //         // Dữ liệu trần sàn tham chiếu: 
-    //         marketRes.ohlcv(socket, parseData)
-    //     } else { }
-
-    //     // console.log('match data wsCoinAPI >>>>>>>>>>>>>', parseData, socket.id);
-    // } else {
-    //     // console.log("dont match: ", socket.id);
-    // }
-})
 
 
 io.of("/").adapter.on("create-room", (room) => {

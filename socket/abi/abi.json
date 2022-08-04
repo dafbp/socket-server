@@ -30,5 +30,47 @@
                 "type": "string"
             }
         ]
+    },
+    "auth_login": {
+        "input": [
+            {
+                "param": "username",
+                "type": "string"
+            },
+            {
+                "param": "password",
+                "type": "string"
+            }
+        ]},
+    "auth_register": {
+        "input": [
+            {
+                "param": "name",
+                "type": "string"
+            },
+            {
+                "param": "username",
+                "type": "string"
+            },
+            {
+                "param": "password",
+                "type": "string"
+            }
+        ]},
+    "cmc_crypto_info": {
+        "input": [
+            {
+                "param": "symbol_id",
+                "type": "string"
+            }
+        ]
+    },
+    "cmc_crypto_category": {
+        "input": [
+            {
+                "param": "id",
+                "type": "string"
+            }
+        ]
     }
 }
