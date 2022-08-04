@@ -202,33 +202,27 @@ io.on('connection', function (socket) {
         }
     });
 
-    // const subcriber = EventInternalInstance.publiser.subscribe(({ type, data: parseData }) => {
-    //     const [exchange, type_trade, trade_currency, ref_currency] = parseData.symbol_id.split('_')
-    //     const { checkSubMap } = SubcriberManagerInstance
-
-    //     const isCheckSubPass = checkSubMap(socket.id, `${trade_currency}/${ref_currency}`, exchange, type_trade)
-    //     if (isCheckSubPass) {
-    //         if (parseData.type === 'trade') {
-    //             // -- Giữ liệu giá thị trường Realtime 
-    //             marketRes.trade(socket, parseData)
-    //         } else if (parseData.type === 'qoute') {
-    //             marketRes.qoute(socket, parseData)
-    //         } else if (parseData.type === 'ohlcv') {
-    //             // Dữ liệu trần sàn tham chiếu: 
-    //             marketRes.ohlcv(socket, parseData)
-    //         } else {}
-
-    //         // console.log('match data wsCoinAPI >>>>>>>>>>>>>', parseData, socket.id);
-    //     } else {
-    //         // console.log("dont match: ", socket.id);
-    //     }
-    // })
-
     socket.on('disconnect', () => {
         logger.error(`Connection left (${socket.id})`)
         // subcriber.unsubcribe()
     });
 });
+
+const subcriber = EventInternalInstance.publiser.subscribe(({ type, data: parseData }) => {
+    const [exchange, type_trade, trade_currency, ref_currency] = parseData.symbol_id.split('_')
+    const { type: typeTopic }: { type: ITopicDataSupport} = parseData
+    
+    if (parseData.type === 'trade') {
+        // -- Giữ liệu giá thị trường Realtime
+        marketRes.trade(io.sockets, parseData, parseData.symbol_id)
+    } else if (parseData.type === 'qoute') {
+        marketRes.qoute(io.sockets, parseData, parseData.symbol_id)
+    } else if (parseData.type === 'ohlcv') {
+        // Dữ liệu trần sàn tham chiếu:
+        marketRes.ohlcv(io.sockets, parseData, parseData.symbol_id)
+    } else { }
+
+})
 
 
 io.of("/").adapter.on("create-room", (room) => {
