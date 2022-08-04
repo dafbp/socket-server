@@ -34,10 +34,11 @@ declare global {
     interface ISubReq {
         method: 'sub' | 'unsub';
         id: number,
-        exchange: IExchangeSupport[]
-        topic: ITopicDataSupport[]
-        value: ISymbolSupport[]
-        trade_filter: ITopicTradeSupport[]
+        // exchange: IExchangeSupport[]
+        // topic: ITopicDataSupport[]
+        // value: ISymbolSupport[]
+        // trade_filter: ITopicTradeSupport[]
+        symbol_ids: []
     }
 
 }

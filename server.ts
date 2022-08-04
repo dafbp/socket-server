@@ -178,8 +178,11 @@ io.on('connection', function (socket) {
                 socket.emit('sub-response', { type: 'error', message: "Sub thất bại: Thiếu id ", info: subInfo, id: subInfo.id })
             } else {
                 socket.emit('sub-response', { type: 'success', message: "Sub thành công ", info: subInfo, id: subInfo.id })
-                // ---- join room test
-                DEFAULT_ROOM_MARKET.forEach((room) => socket.join(room))
+                // ---- join room
+                const symbol_ids = subInfo.symbol_ids || []
+                if (symbol_ids.length) {
+                    symbol_ids.forEach((room) => socket.join(room))
+                }
                 // -------
             }
         } else {
@@ -194,8 +197,11 @@ io.on('connection', function (socket) {
                 socket.emit('unsub-response', { type: 'error', message: "unsub thất bại: thiếu id ", info: unsubInfo, id: unsubInfo.id })
             } else {
                 socket.emit('unsub-response', { type: 'success', message: "unsub thành công ", info: unsubInfo, id: unsubInfo.id })
-                // ---- leave room test
-                DEFAULT_ROOM_MARKET.forEach((room) => socket.leave(room))
+                // ---- leave room
+                const symbol_ids = unsubInfo.symbol_ids || []
+                if (symbol_ids.length) {
+                    symbol_ids.forEach((room) => socket.join(room))
+                }
             }
         } else {
             socket.emit('unsub-response', { type: 'error', message: "unsub thất bại: Sai method ", info: unsubInfo, id: unsubInfo.id })
