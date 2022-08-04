@@ -4,6 +4,7 @@ export const methodRes = {
         const verifyResult: IResMethodCall = {
             ...result,
             type: 'success',
+            success: true,
         }
 
         socket.emit('method-response', verifyResult);
@@ -12,6 +13,7 @@ export const methodRes = {
         const verifyResult: IResMethodCall = {
             ...result,
             type: 'error',
+            success: false,
         }
 
         socket.emit('method-response', verifyResult);
@@ -20,6 +22,7 @@ export const methodRes = {
         const verifyResult: IResMethodCall = {
             ...result,
             type: 'private',
+            success: true,
         }
 
         socket.emit('method-response', verifyResult);

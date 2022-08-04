@@ -19,6 +19,7 @@ declare global {
         result: Object | Object[]
         message: string,
         type?: 'private' | 'success' | 'error',
+        success?: boolean
     }
     
     interface IMarketRes {

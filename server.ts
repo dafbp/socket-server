@@ -208,8 +208,6 @@ io.on('connection', function (socket) {
         }
     });
     socket.on('rooms', (rooms: any) => {
-        console.log(socket.rooms, );
-        
         socket.emit('rooms-response', { type: 'success', message: "Get room ok!", results: Array.from(socket.rooms.values()) })
     });
 

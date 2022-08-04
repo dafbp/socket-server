@@ -72,5 +72,8 @@
                 "type": "string"
             }
         ]
+    },
+    "cmc_crypto_categories": {
+        "input": []
     }
 }
