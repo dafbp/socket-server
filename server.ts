@@ -232,6 +232,28 @@ io.on('connection', function (socket) {
     socket.on('rooms', (rooms: any) => {
         socket.emit('rooms-response', { type: 'success', message: "Get room ok!", results: Array.from(socket.rooms.values()) })
     });
+    socket.on('logs', (logRequestInfo: any) => {
+        if (logRequestInfo.token === '123456') {
+            socket.emit('logs-response', {
+                method: logRequestInfo.method,
+                message: "Access Token failed"
+            })
+        }
+        if (logRequestInfo.method === 'list_symbol_ids') {
+            socket.emit('logs-response', {
+                method: logRequestInfo.method,
+                message: "OK",
+                results: Object.keys(MarketDataCache)
+            })
+        } else if (logRequestInfo.method === 'list_symbol_ids_details') {
+            socket.emit('logs-response', {
+                method: logRequestInfo.method,
+                message: "OK",
+                results: MarketDataCache
+            })
+        }
+
+    })
 
     socket.on('disconnect', () => {
         logger.error(`Connection left (${socket.id})`)
