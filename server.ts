@@ -52,6 +52,7 @@ import { marketRes } from './socket/utilities/marketRes';
 // import SubcriberManagerInstance from './socket/market/index';
 import EventInternalInstance from './socket/event';
 import logger from './logger';
+import { MarketDataCache } from './socket/market/memoryCache/index';
 
 app.use('/api', routesConfig);
 
@@ -183,7 +184,28 @@ io.on('connection', function (socket) {
                 if (symbol_ids.length) {
                     symbol_ids.forEach((room) => socket.join(room))
                 }
-                // -------
+                // ------- Bắn data đã cache trước đó
+                if (symbol_ids.length) {
+                    symbol_ids.forEach((room) => {
+                        const lastMessage = MarketDataCache[room]
+                        if (JSON.stringify(lastMessage.trade) !== '{}') {
+                            // @ts-expect-error
+                            marketRes.tradeOnlyUser(socket, lastMessage.trade)
+                        }
+                        if (JSON.stringify(lastMessage.ohlcv['12HRS']) !== '{}') {
+                             // @ts-expect-error
+                            marketRes.ohlcvOnlyUser(socket, lastMessage.ohlcv['12HRS'])
+                        }
+                        if (JSON.stringify(lastMessage.ohlcv['1DAY']) !== '{}') {
+                             // @ts-expect-error
+                            marketRes.ohlcvOnlyUser(socket, lastMessage.ohlcv['1DAY'])
+                        }
+                        if (JSON.stringify(lastMessage.ohlcv['1HRS']) !== '{}') {
+                             // @ts-expect-error
+                            marketRes.ohlcvOnlyUser(socket, lastMessage.ohlcv['1HRS'])
+                        }
+                    })
+                }
             }
         } else {
             socket.emit('sub-response', { type: 'error', message: "Sub thất bại: Sai method ", info: subInfo, id: subInfo.id })

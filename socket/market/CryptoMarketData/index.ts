@@ -7,6 +7,7 @@ import logger from '../../../logger'
 
 const websocketDomain = ["wss://ws-sandbox.coinapi.io/v1/", "wss://ws.coinapi.io/v1/"]
 
+
 export const createWebSocket = () => {
     const ws = new WebSocket(websocketDomain[1]);
     logger.info(`createWebSocket >>>>>> ${ws._url} api_key: ${svrConfig.COINAPI_KEY} env: ${process.env.ENV}`)
