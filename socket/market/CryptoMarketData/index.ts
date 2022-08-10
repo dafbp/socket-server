@@ -21,7 +21,7 @@ export const startListenCryptoMarketData = () => {
         apikey: svrConfig.COINAPI_KEY,
         heartbeat: false,
         subscribe_data_type: ['trade', 'ohlcv'],
-        subscribe_filter_asset_id: ["BTC/USDT", "ETH/USDT"],
+        // subscribe_filter_asset_id: ["BTC/USDT", "ETH/USDT"],
         subscribe_filter_symbol_id: ["COINBASE", "BINANCEUAT", "BINANCE", "FTX", "HOUBIPRO"],
         subscribe_filter_period_id: ["1DAY", "12HRS", "1HRS"]
     };
@@ -58,12 +58,12 @@ export const startListenCryptoMarketData = () => {
     wsCoinAPI.on('open', function open() {
         logger.info(`New connection to wsCoinAPI`)
         // wsCoinAPI.send(JSON.stringify(exampleCall));
-        wsCoinAPI.send(JSON.stringify(configSubcribe.trade));
-        wsCoinAPI.send(JSON.stringify(configSubcribe.ohlvc));
+        wsCoinAPI.send(JSON.stringify(exampleCall));
+        // wsCoinAPI.send(JSON.stringify(configSubcribe.ohlvc));
     });
 
     wsCoinAPI.on('message', function incoming(data) {
-        // console.log("message", data);
+        console.log("message", data);
         
         const parseData = JSON.parse(data.toString())
         EventInternalInstance.publiser.next({ type: 'rx-market', data: parseData })
