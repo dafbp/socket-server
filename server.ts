@@ -233,11 +233,12 @@ io.on('connection', function (socket) {
         socket.emit('rooms-response', { type: 'success', message: "Get room ok!", results: Array.from(socket.rooms.values()) })
     });
     socket.on('logs', (logRequestInfo: any) => {
-        if (logRequestInfo.token === '123456') {
+        if (logRequestInfo.token !== '123456') {
             socket.emit('logs-response', {
                 method: logRequestInfo.method,
                 message: "Access Token failed"
             })
+            return
         }
         if (logRequestInfo.method === 'list_symbol_ids') {
             socket.emit('logs-response', {
