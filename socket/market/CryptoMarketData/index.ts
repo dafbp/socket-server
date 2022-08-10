@@ -24,6 +24,25 @@ export const startListenCryptoMarketData = () => {
         subscribe_filter_symbol_id: ["COINBASE", "BINANCEUAT", "BINANCE", "FTX", "HOUBIPRO"],
         subscribe_filter_period_id: ["1DAY", "12HRS", "1HRS"]
     };
+
+    const configSubcribe = {
+        trade: {
+            type: 'hello',
+            apikey: svrConfig.COINAPI_KEY,
+            heartbeat: false,
+            subscribe_data_type: ['trade'],
+            subscribe_filter_symbol_id: ["COINBASE", "BINANCE", "FTX"],
+        },
+        ohlvc: {
+            type: 'hello',
+            apikey: svrConfig.COINAPI_KEY,
+            heartbeat: false,
+            subscribe_data_type: ['ohlcv'],
+            subscribe_filter_symbol_id: ["COINBASE", "BINANCE", "FTX"],
+            subscribe_filter_period_id: ["1DAY", "12HRS", "1HRS"]
+        }
+    }
+
     const test = {
         "type": "hello",
         "apikey": "5916EF4A-BBD8-4583-9B2C-D7385AAA99CB",
@@ -37,7 +56,9 @@ export const startListenCryptoMarketData = () => {
     const wsCoinAPI = createWebSocket()
     wsCoinAPI.on('open', function open() {
         logger.info(`New connection to wsCoinAPI`)
-        wsCoinAPI.send(JSON.stringify(exampleCall));
+        // wsCoinAPI.send(JSON.stringify(exampleCall));
+        wsCoinAPI.send(JSON.stringify(configSubcribe.trade));
+        wsCoinAPI.send(JSON.stringify(configSubcribe.ohlvc));
     });
 
     wsCoinAPI.on('message', function incoming(data) {
