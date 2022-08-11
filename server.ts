@@ -169,7 +169,7 @@ io.on('connection', function (socket) {
     });
 
     socket.on('message', data => {
-        console.log('message', data);
+        // console.log('message', data);
     });
 
     socket.on('sub', (subInfo: ISubReq) => {
@@ -263,8 +263,8 @@ io.on('connection', function (socket) {
 });
 
 const subcriber = EventInternalInstance.publiser.subscribe(({ type, data: parseData }) => {
-    const [exchange, type_trade, trade_currency, ref_currency] = parseData.symbol_id.split('_')
-    const { type: typeTopic }: { type: ITopicDataSupport} = parseData
+    // const [exchange, type_trade, trade_currency, ref_currency] = parseData.symbol_id.split('_')
+    // const { type: typeTopic }: { type: ITopicDataSupport} = parseData
     
     if (parseData.type === 'trade') {
         // -- Giữ liệu giá thị trường Realtime
