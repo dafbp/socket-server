@@ -63,7 +63,7 @@ export const startListenCryptoMarketData = () => {
     });
 
     wsCoinAPI.on('message', function incoming(data) {
-        console.log("message", data);
+        // console.log("message", data);
         
         const parseData = JSON.parse(data.toString())
         EventInternalInstance.publiser.next({ type: 'rx-market', data: parseData })
