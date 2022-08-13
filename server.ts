@@ -213,7 +213,7 @@ io.on('connection', function (socket) {
     });
 
     socket.on('sub', (subInfo: ISubReq) => {
-        console.log('sub', subInfo);
+        // console.log('sub', subInfo);
         const result = subModelRequest.validate(subInfo)
         if (result.error?.message || subInfo.method !== 'sub') {
             socket.emit('sub-response', { 
@@ -257,7 +257,7 @@ io.on('connection', function (socket) {
 
     });
     socket.on('unsub', (unsubInfo: ISubReq) => {
-        console.log('unsub', unsubInfo);
+        // console.log('unsub', unsubInfo);
         const result = subModelRequest.validate(unsubInfo)
         if (result.error?.message || unsubInfo.method !== 'unsub') {
             socket.emit('unsub-response', {
