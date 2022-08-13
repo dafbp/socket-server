@@ -16,6 +16,8 @@ let httpServer;
 import socketABIMethod from './socket/abi/abi.json';
 import fs from 'fs';
 import methodCall from './socket/method'
+import Joi from 'joi'
+import parseJoiToJSON from 'joi-to-json'
 
 /**
  * Configure middleware
@@ -53,6 +55,8 @@ import { marketRes } from './socket/utilities/marketRes';
 import EventInternalInstance from './socket/event';
 import logger from './logger';
 import { MarketDataCache } from './socket/market/memoryCache/index';
+import schema from './socket/validate/schema';
+import { methodModelRequest, subModelRequest } from './socket/validate/modelRequest';
 
 app.use('/api', routesConfig);
 
@@ -87,7 +91,7 @@ httpServer.listen(srvConfig.SERVER_PORT, () => {
         useNewUrlParser: true,
         useUnifiedTopology: true
     }, (error: any) => {
-        logger.error(`error connect db ${JSON.stringify(error)}`);
+        if (error) logger.error(`error connect db ${JSON.stringify(error)}`);
 
         console.log(`Server started on port ${srvConfig.SERVER_PORT}`);
     });
@@ -119,52 +123,88 @@ io.on('connection', function (socket) {
     // console.log("list socket: io.sockets", io.sockets.size, io.sockets);
     // ---- join room by default
     DEFAULT_ROOM_MARKET.forEach((room) => socket.join(room))
-    
+
     // SubcriberManagerInstance.createSubMapPerUser(socket.id)
     // -------- Method and service call
     socket.on('method', (req: IReqMethodCall) => {
-        if (req.method === 'abi' && socketABIMethod[req.method]) {
-            if (req.params[0] === 'all') {
-                methodRes.private(socket, {
-                    method: req.method,
-                    id: req.id,
-                    message: 'Lấy ABI thành công',
-                    result: socketABIMethod,
-                })
-            } else {
-                methodRes.private(socket, {
-                    method: req.method,
-                    id: req.id,
-                    message: 'Lấy ABI thành công',
-                    result: socketABIMethod[req.params[0]],
-                })
-            }
-        } else if (socketABIMethod[req.method]) {
-            const { isValidatedRequest, messageError } = validateRequest(socket, req.params, socketABIMethod[req.method])
-            // ---- 
-            if (isValidatedRequest) {
-                const call = methodCall[req.method]
-                if (typeof call !== 'function') {
-                    methodRes.error(socket, {
-                        id: req.id,
-                        method: req.method,
-                        message: "Internal server error",
-                        result: [],
-                    })
-                } else {
-                    call(socket, socketABIMethod[req.method], req)
-                }
-            } else {
+        // ----------- 
+        const result = methodModelRequest.validate(req)
+        
+        if (result.error?.message) {
+            methodRes.error(socket, {
+                id: req.id,
+                method: req.method,
+                message: result.error?.message,
+                result: [],
+            })
+            return
+        }
+
+        // ------- Validation input 
+        const methodSchema = schema[req.method]
+        if (!methodSchema) {
+            methodRes.error(socket, {
+                id: req.id,
+                method: req.method,
+                message: "Don't have this method: " + req.method,
+                result: [],
+            })
+            return
+        } else if (!Joi.isSchema(methodSchema)) {
+            methodRes.error(socket, {
+                id: req.id,
+                method: req.method,
+                message: "Don't have schema for: " + req.method,
+                result: [],
+            })
+            return
+        } else {
+            // ----- Validate params
+            const resultValidate = methodSchema.validate(req.params)
+            if (resultValidate.error?.message) {
                 methodRes.error(socket, {
                     id: req.id,
                     method: req.method,
-                    message: messageError,
+                    message: resultValidate.error?.message,
                     result: [],
                 })
+                return
+            } else {
+                if (req.method === 'abi') {
+                    console.log("Joi.isSchema()", Joi.isSchema(schema.abi), schema.abi);
+                    
+                    if (req.params[0] === 'all') {
+                        methodRes.private(socket, {
+                            method: req.method,
+                            id: req.id,
+                            message: 'Lấy ABI thành công',
+                            result: Object.keys(schema),
+                        })
+                    } else {
+                        methodRes.private(socket, {
+                            method: req.method,
+                            id: req.id,
+                            message: 'Lấy ABI thành công',
+                            result: parseJoiToJSON(schema[req.params[0]]),
+                        })
+                    }
+                } else {
+                    const call = methodCall[req.method]
+                    if (typeof call !== 'function') {
+                        methodRes.error(socket, {
+                            id: req.id,
+                            method: req.method,
+                            message: "Internal server error",
+                            result: [],
+                        })
+                    } else {
+                        call(socket, methodSchema, req)
+                    }
+                }
             }
-        } else {
-            socket.emit('method-response', { type: 'error', message: "Method sai" })
         }
+
+
         logger.info('method', req);
     });
 
@@ -174,60 +214,66 @@ io.on('connection', function (socket) {
 
     socket.on('sub', (subInfo: ISubReq) => {
         console.log('sub', subInfo);
-        if (subInfo.method === 'sub') {
-            if (typeof subInfo.id !== 'number') {
-                socket.emit('sub-response', { type: 'error', message: "Sub thất bại: Thiếu id ", info: subInfo, id: subInfo.id })
-            } else {
-                socket.emit('sub-response', { type: 'success', message: "Sub thành công ", info: subInfo, id: subInfo.id })
-                // ---- join room
-                const symbol_ids = subInfo.symbol_ids || []
-                if (symbol_ids.length) {
-                    symbol_ids.forEach((room) => socket.join(room))
-                }
-                // ------- Bắn data đã cache trước đó
-                if (symbol_ids.length) {
-                    symbol_ids.forEach((room) => {
-                        const lastMessage = MarketDataCache[room]
-                        if (!lastMessage) return
-                        if (JSON.stringify(lastMessage.trade) !== '{}') {
-                            // @ts-expect-error
-                            marketRes.tradeOnlyUser(socket, lastMessage.trade)
-                        }
-                        if (JSON.stringify(lastMessage.ohlcv['12HRS']) !== '{}') {
-                             // @ts-expect-error
-                            marketRes.ohlcvOnlyUser(socket, lastMessage.ohlcv['12HRS'])
-                        }
-                        if (JSON.stringify(lastMessage.ohlcv['1DAY']) !== '{}') {
-                             // @ts-expect-error
-                            marketRes.ohlcvOnlyUser(socket, lastMessage.ohlcv['1DAY'])
-                        }
-                        if (JSON.stringify(lastMessage.ohlcv['1HRS']) !== '{}') {
-                             // @ts-expect-error
-                            marketRes.ohlcvOnlyUser(socket, lastMessage.ohlcv['1HRS'])
-                        }
-                    })
-                }
-            }
+        const result = subModelRequest.validate(subInfo)
+        if (result.error?.message || subInfo.method !== 'sub') {
+            socket.emit('sub-response', { 
+                type: 'error', 
+                message: "Sub thất bại: " + result.error?.message, 
+                info: subInfo, 
+                id: subInfo.id 
+            })
+            return
         } else {
-            socket.emit('sub-response', { type: 'error', message: "Sub thất bại: Sai method ", info: subInfo, id: subInfo.id })
+            socket.emit('sub-response', { type: 'success', message: "Sub thành công ", info: subInfo, id: subInfo.id })
+            // ---- join room
+            const symbol_ids = subInfo.symbol_ids || []
+            if (symbol_ids.length) {
+                symbol_ids.forEach((room) => socket.join(room))
+            }
+            // ------- Bắn data đã cache trước đó
+            if (symbol_ids.length) {
+                symbol_ids.forEach((room) => {
+                    const lastMessage = MarketDataCache[room]
+                    if (!lastMessage) return
+                    if (JSON.stringify(lastMessage.trade) !== '{}') {
+                        // @ts-expect-error
+                        marketRes.tradeOnlyUser(socket, lastMessage.trade)
+                    }
+                    if (JSON.stringify(lastMessage.ohlcv['12HRS']) !== '{}') {
+                        // @ts-expect-error
+                        marketRes.ohlcvOnlyUser(socket, lastMessage.ohlcv['12HRS'])
+                    }
+                    if (JSON.stringify(lastMessage.ohlcv['1DAY']) !== '{}') {
+                        // @ts-expect-error
+                        marketRes.ohlcvOnlyUser(socket, lastMessage.ohlcv['1DAY'])
+                    }
+                    if (JSON.stringify(lastMessage.ohlcv['1HRS']) !== '{}') {
+                        // @ts-expect-error
+                        marketRes.ohlcvOnlyUser(socket, lastMessage.ohlcv['1HRS'])
+                    }
+                })
+            }
         }
-        
+
     });
     socket.on('unsub', (unsubInfo: ISubReq) => {
         console.log('unsub', unsubInfo);
-        if (unsubInfo.method === 'unsub') {
-            if (typeof unsubInfo.id !== 'number') {
-                socket.emit('unsub-response', { type: 'error', message: "unsub thất bại: thiếu id ", info: unsubInfo, id: unsubInfo.id })
-            } else {
-                socket.emit('unsub-response', { type: 'success', message: "unsub thành công ", info: unsubInfo, id: unsubInfo.id })
-                // ---- leave room
-                const symbol_ids = unsubInfo.symbol_ids || []
-                if (symbol_ids.length) {
-                    symbol_ids.forEach((room) => socket.leave(room))
-                }
-            }
+        const result = subModelRequest.validate(unsubInfo)
+        if (result.error?.message || unsubInfo.method !== 'unsub') {
+            socket.emit('unsub-response', {
+                type: 'error',
+                message: "Sub thất bại: " + result.error?.message,
+                info: unsubInfo,
+                id: unsubInfo.id
+            })
+            return
         } else {
-            socket.emit('unsub-response', { type: 'error', message: "unsub thất bại: Sai method ", info: unsubInfo, id: unsubInfo.id })
+            socket.emit('unsub-response', { type: 'success', message: "unsub thành công ", info: unsubInfo, id: unsubInfo.id })
+            // ---- leave room
+            const symbol_ids = unsubInfo.symbol_ids || []
+            if (symbol_ids.length) {
+                symbol_ids.forEach((room) => socket.leave(room))
+            }
         }
     });
     socket.on('rooms', (rooms: any) => {
@@ -266,7 +312,7 @@ io.on('connection', function (socket) {
 const subcriber = EventInternalInstance.publiser.subscribe(({ type, data: parseData }) => {
     // const [exchange, type_trade, trade_currency, ref_currency] = parseData.symbol_id.split('_')
     // const { type: typeTopic }: { type: ITopicDataSupport} = parseData
-    
+
     if (parseData.type === 'trade') {
         // -- Giữ liệu giá thị trường Realtime
         marketRes.trade(io.sockets, parseData, parseData.symbol_id)

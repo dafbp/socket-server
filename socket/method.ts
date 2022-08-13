@@ -11,19 +11,19 @@ const cmc_crypto_categorySchema = db.collection('cmc_crypto_category')
 const cmc_crypto_categoriesSchema = db.collection('cmc_crypto_categories')
 
 
-const auth = async (socket, ABI, req) => {
-    console.log(req, ABI);
+const auth = async (socket, paramsSchema, req) => {
+    console.log(req, paramsSchema);
 
     methodRes.success(socket, {
         type: 'success',
         method: req.method,
         id: req.id,
         message: 'Đăng nhập thành công',
-        result: ABI.output,
+        result: paramsSchema.output,
     })
 }
 
-const cmc_crypto_info = async (socket, ABI, req) => {
+const cmc_crypto_info = async (socket, paramsSchema, req) => {
     let [symbol] = req.params;
 
     await cmc_crypto_infoSchema.findOne({ symbol: symbol }, function (err, symbolInfo) {
@@ -51,7 +51,7 @@ const cmc_crypto_info = async (socket, ABI, req) => {
         }
     });
 }
-const cmc_crypto_category = async (socket, ABI, req) => {
+const cmc_crypto_category = async (socket, paramsSchema, req) => {
     let [id] = req.params;
 
     await cmc_crypto_categorySchema.findOne({ id: id }, function (err, data) {
@@ -79,7 +79,7 @@ const cmc_crypto_category = async (socket, ABI, req) => {
         }
     });
 }
-const cmc_crypto_categories = async (socket, ABI, req) => {
+const cmc_crypto_categories = async (socket, paramsSchema, req) => {
     let [] = req.params;
 
     await cmc_crypto_categoriesSchema.find({}).limit(50).toArray(function (err, data) {
@@ -108,7 +108,7 @@ const cmc_crypto_categories = async (socket, ABI, req) => {
     });
 }
 
-const auth_login = async (socket, ABI, req) => {
+const auth_login = async (socket, paramsSchema, req) => {
     let [username, password] = req.params;
 
     await Users.findOne({ username: username }, function (err, user) {
@@ -143,7 +143,7 @@ const auth_login = async (socket, ABI, req) => {
     });
 
 }
-const auth_register = async (socket, ABI, req) => {
+const auth_register = async (socket, paramsSchema, req) => {
     let [name, username, password] = req.params;
 
     if (!name || !username || !password) return methodRes.error(socket, {
