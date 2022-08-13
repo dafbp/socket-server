@@ -188,6 +188,7 @@ io.on('connection', function (socket) {
                 if (symbol_ids.length) {
                     symbol_ids.forEach((room) => {
                         const lastMessage = MarketDataCache[room]
+                        if (!lastMessage) return
                         if (JSON.stringify(lastMessage.trade) !== '{}') {
                             // @ts-expect-error
                             marketRes.tradeOnlyUser(socket, lastMessage.trade)
