@@ -304,7 +304,7 @@ io.on('connection', function (socket) {
     })
 
     socket.on('disconnect', () => {
-        logger.error(`Connection left (${socket.id})`)
+        logger.info(`Connection left (${socket.id})`)
         // subcriber.unsubcribe()
     });
 });
@@ -344,12 +344,12 @@ io.of("/").adapter.on("leave-room", (room, id) => {
 
 startListenCryptoMarketData()
 
-const validateRequest = (socket, data, methodConfigABI) => {
-    if (methodConfigABI?.input?.length !== data?.length) {
-        return { messageError: "Internal server error: validateRequest failed", isValidatedRequest: false }
-    } else if (false) {
-        return { messageError: "Internal server error: validateRequest failed", isValidatedRequest: false }
-    }
+// const validateRequest = (socket, data, methodConfigABI) => {
+//     if (methodConfigABI?.input?.length !== data?.length) {
+//         return { messageError: "Internal server error: validateRequest failed", isValidatedRequest: false }
+//     } else if (false) {
+//         return { messageError: "Internal server error: validateRequest failed", isValidatedRequest: false }
+//     }
 
-    return { messageError: "", isValidatedRequest: true }
-}
+//     return { messageError: "", isValidatedRequest: true }
+// }

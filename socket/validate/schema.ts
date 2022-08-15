@@ -2,10 +2,9 @@
  * All Scheme
  * 
  */
+import Joi from 'joi'
 
-const Joi = require('joi')
-
-const abi = Joi.array()
+const abi = Joi.array().label('params')
     .length(1)
     .required()
     .ordered(
@@ -14,7 +13,7 @@ const abi = Joi.array()
         })
     );
     
-const auth = Joi.array()
+const auth = Joi.array().label('params')
     .length(2)
     .required()
     .ordered(
@@ -25,7 +24,7 @@ const auth = Joi.array()
             'string.empty': '[{{#label}}: password] is required as string',
         }),
     );
-const auth_login = Joi.array()
+const auth_login = Joi.array().label('params')
     .length(2)
     .required()
     .ordered(
@@ -36,7 +35,7 @@ const auth_login = Joi.array()
             'string.empty': '[{{#label}}: password] is required as string',
         }),
     );
-const auth_register = Joi.array()
+const auth_register = Joi.array().label('params')
     .length(3)
     .required()
     .ordered(
@@ -50,7 +49,7 @@ const auth_register = Joi.array()
             'string.empty': '[{{#label}}: password] is required as string',
         }),
     );
-const cmc_crypto_info = Joi.array()
+const cmc_crypto_info = Joi.array().label('params')
     .length(1)
     .required()
     .ordered(
@@ -58,7 +57,7 @@ const cmc_crypto_info = Joi.array()
             'string.empty': '[{{#label}}: symbol_id] is required as string',
         }),
     );
-const cmc_crypto_category = Joi.array()
+const cmc_crypto_category = Joi.array().label('params')
     .length(1)
     .required()
     .ordered(
@@ -66,7 +65,7 @@ const cmc_crypto_category = Joi.array()
             'string.empty': '[{{#label}}: id_category] is required as string',
         }),
     );
-const cmc_crypto_categories = Joi.array()
+const cmc_crypto_categories = Joi.array().label('params')
     .length(0)
     .required()
 

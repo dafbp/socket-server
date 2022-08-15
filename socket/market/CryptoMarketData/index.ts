@@ -26,24 +26,6 @@ export const startListenCryptoMarketData = () => {
         subscribe_filter_period_id: ["1DAY", "12HRS", "1HRS"]
     };
 
-    const configSubcribe = {
-        trade: {
-            type: 'hello',
-            apikey: svrConfig.COINAPI_KEY,
-            heartbeat: false,
-            subscribe_data_type: ['trade'],
-            subscribe_filter_symbol_id: ["COINBASE", "BINANCE", "FTX"],
-        },
-        ohlvc: {
-            type: 'hello',
-            apikey: svrConfig.COINAPI_KEY,
-            heartbeat: false,
-            subscribe_data_type: ['ohlcv'],
-            subscribe_filter_symbol_id: ["COINBASE", "BINANCE", "FTX"],
-            subscribe_filter_period_id: ["1DAY", "12HRS", "1HRS"]
-        }
-    }
-
     const test = {
         "type": "hello",
         "apikey": "5916EF4A-BBD8-4583-9B2C-D7385AAA99CB",
@@ -67,25 +49,17 @@ export const startListenCryptoMarketData = () => {
         
         const parseData = JSON.parse(data.toString())
         EventInternalInstance.publiser.next({ type: 'rx-market', data: parseData })
-
-        // const [exchange, type_trade, trade_currency, ref_currency] = parseData.symbol_id.split('_')
-        // const { checkSubMap } = SubcriberManagerInstance
-
-        // const isCheckSubPass = checkSubMap(socket.id, `${trade_currency}/${ref_currency}`, exchange, type_trade)
-        // if (isCheckSubPass) {
-        //     marketRes.qoute(socket, parseData)
-        //     console.log('match data wsCoinAPI >>>>>>>>>>>>>', parseData, socket.id);
-        // } else {
-        //     console.log("dont match: ", data.toString(), socket.id);
-        // }
-
-
     });
     wsCoinAPI.on('error', (error) => {
         logger.error(`wsCoinAPI error ${JSON.stringify(error)}`)
+        wsCoinAPI.close()
     })
     wsCoinAPI.on('close', (close) => {
         logger.error(`wsCoinAPI close ${JSON.stringify(close)}`)
+        setTimeout(()=> {
+            startListenCryptoMarketData()
+            logger.error("wsCoinAPI startListenCryptoMarketData on close ")
+        }, 10000)
     })
 }
 export default {}
