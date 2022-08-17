@@ -1,9 +1,9 @@
 import winston from 'winston'
+const { combine, timestamp, json } = winston.format;
 
 const logger = winston.createLogger({
     level: 'info',
-    format: winston.format.json(),
-    defaultMeta: { timestamp: new Date() },
+    format: combine(timestamp({ format: () => new Date().toISOString() }), json()),
     transports: [
         //
         // - Write to all logs with level `info` and below to `combined.log`
