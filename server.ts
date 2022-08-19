@@ -57,6 +57,7 @@ import logger from './logger';
 import { MarketDataCache } from './socket/market/memoryCache/index';
 import schema from './socket/validate/schema';
 import { methodModelRequest, subModelRequest } from './socket/validate/modelRequest';
+import { UserSessionMap } from './socket/validate/userSession';
 
 app.use('/api', routesConfig);
 
@@ -280,13 +281,18 @@ io.on('connection', function (socket) {
         socket.emit('rooms-response', { type: 'success', message: "Get room ok!", results: Array.from(socket.rooms.values()) })
     });
     socket.on('logs', (logRequestInfo: any) => {
-        if (logRequestInfo.token !== '123456') {
+        // Xác thực quyền admin trước khi phản hồi
+        const userSession = UserSessionMap.getUserSession(socket.id)
+        // console.log("userSession", userSession, userSession?.jwt?.roles, userSession?.jwt?.roles?.includes('admin'));
+        
+        if (!userSession || !userSession.auth || !userSession?.jwt?.roles?.includes('admin')) {
             socket.emit('logs-response', {
                 method: logRequestInfo.method,
-                message: "Access Token failed"
+                message: "Access Token failed. Bạn cần xác thực kết nối để sử dụng dịch vụ này"
             })
             return
         }
+        // ----------
         if (logRequestInfo.method === 'list_symbol_ids') {
             socket.emit('logs-response', {
                 method: logRequestInfo.method,
@@ -305,6 +311,7 @@ io.on('connection', function (socket) {
 
     socket.on('disconnect', () => {
         logger.info(`Connection left (${socket.id})`)
+        UserSessionMap.removeUserSession(socket.id)
         // subcriber.unsubcribe()
     });
 });

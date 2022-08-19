@@ -2,13 +2,18 @@ import { methodRes } from './utilities/methodRes';
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import logger from '../logger';
-require('../database/model/users');
+import jwt from 'jsonwebtoken'
+import srvConfig from '../config';
+import { UserSessionMap } from './validate/userSession';
 
+
+require('../database/model/users');
 const db = mongoose.connection;
 const Users = mongoose.model('Users');
 const cmc_crypto_infoSchema = db.collection('cmc_crypto_info')
 const cmc_crypto_categorySchema = db.collection('cmc_crypto_category')
 const cmc_crypto_categoriesSchema = db.collection('cmc_crypto_categories')
+
 
 
 const auth = async (socket, paramsSchema, req) => {
@@ -134,15 +139,57 @@ const auth_login = async (socket, paramsSchema, req) => {
                 result: {}
             })
         }
+        // ------ Generate token JWT ------- 
+        const token = jwt.sign({
+            iat: Math.floor(Date.now() / 1000) - 30,
+            iss: "training-frontend",
+            name: user.username,
+            roles: ['admin'],
+        }, srvConfig.SESSION_SECRET, { expiresIn: 60 * 60 })
+        // ------ 
         return methodRes.success(socket, {
             method: req.method,
             id: req.id,
             message: 'Đăng nhập thành công!',
-            result: user,
+            result: {
+                user: {
+                    username: user.username,
+                    name: user.name,
+                }, 
+                token: token,
+            },
         })
     });
-
 }
+const authenticate = async (socket, paramsSchema, req) => {
+    let [token] = req.params;
+    const { id } = socket
+
+    jwt.verify(token, srvConfig.SESSION_SECRET, function (err, decoded) {
+        // console.log(decoded, err)
+        if (err) {
+            logger.info({ message: "Xác thực token thất bại", ...err })
+            return methodRes.error(socket, {
+                method: req.method,
+                id: req.id,
+                message: 'Error when authen!',
+                result: err,
+            })
+        } else {
+            UserSessionMap.setUserSession(id, { jwt: decoded, token, auth: true })
+            console.log('UserSessionMap', UserSessionMap);
+            
+            return methodRes.success(socket, {
+                method: req.method,
+                id: req.id,
+                message: 'User is successfully authen!',
+                result: decoded,
+            })
+        }
+    })
+    return
+}
+
 const auth_register = async (socket, paramsSchema, req) => {
     let [name, username, password] = req.params;
 
@@ -194,5 +241,6 @@ export default {
     cmc_crypto_category,
     cmc_crypto_categories,
     auth_register,
-    auth_login
+    auth_login,
+    authenticate
 }

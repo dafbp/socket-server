@@ -35,6 +35,14 @@ const auth_login = Joi.array().label('params')
             'string.empty': '[{{#label}}: password] is required as string',
         }),
     );
+const authenticate = Joi.array().label('params')
+    .length(1)
+    .required()
+    .ordered(
+        Joi.string().required().messages({
+            'string.empty': '[{{#label}}: token] is required as string',
+        }),
+    );
 const auth_register = Joi.array().label('params')
     .length(3)
     .required()
@@ -79,4 +87,5 @@ export default {
     cmc_crypto_info,
     cmc_crypto_category,
     cmc_crypto_categories,
+    authenticate
 }
