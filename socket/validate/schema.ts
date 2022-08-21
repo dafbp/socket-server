@@ -76,6 +76,17 @@ const cmc_crypto_category = Joi.array().label('params')
 const cmc_crypto_categories = Joi.array().label('params')
     .length(0)
     .required()
+const get_user_watchlist = Joi.array().label('params')
+    .length(0)
+    .required()
+const add_token_to_user_watchlist = Joi.array().label('params')
+    .length(1)
+    .required()
+    .ordered(
+        Joi.string().required().messages({
+            'string.empty': '[{{#label}}: symbol] is required as string',
+        }),
+    );
 
 
 
@@ -87,5 +98,8 @@ export default {
     cmc_crypto_info,
     cmc_crypto_category,
     cmc_crypto_categories,
-    authenticate
+    authenticate,
+    get_user_watchlist,
+    add_token_to_user_watchlist
+    
 }

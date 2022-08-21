@@ -5,7 +5,7 @@ import logger from '../logger';
 import jwt from 'jsonwebtoken'
 import srvConfig from '../config';
 import { UserSessionMap } from './validate/userSession';
-
+import { get_user_watchlist, add_token_to_user_watchlist } from '../socket/method/watchlist'
 
 require('../database/model/users');
 const db = mongoose.connection;
@@ -242,5 +242,7 @@ export default {
     cmc_crypto_categories,
     auth_register,
     auth_login,
-    authenticate
+    authenticate,
+    get_user_watchlist,
+    add_token_to_user_watchlist,
 }
