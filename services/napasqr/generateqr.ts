@@ -1,4 +1,5 @@
 const qrcode = require('qrcode-terminal');
+const { bankInfo } = require('./listbank');
 
 const lengthToString = (string) => {
 
@@ -62,7 +63,7 @@ function crc16(s) {
     var j, i;
 
     for (i = 0; i < s.length; i++) {
-        c = s.charCodeAt(i);
+        const c = s.charCodeAt(i);
         if (c > 255) {
             throw new RangeError();
         }
@@ -82,7 +83,7 @@ const qrString = generateFinalQrBankString({
     acount_no: '0841000053431',
     amount: '1000000',
     note: 'NVDThanhtoanAltisss',
-    bank_code: '970436',
+    bank_code: bankInfo.VCB.bin,
 });
 console.log('[generateFinalQrBankString]: ', qrString);
 
