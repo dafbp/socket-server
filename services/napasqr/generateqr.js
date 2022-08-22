@@ -1,19 +1,21 @@
 const qrcode = require('qrcode-terminal');
 
-const qrmatrix = [
-    ['00', '01'], // Payload Format Indicator/ Phiên bản dữ liệu
-    ['01', '12'], // Point of Initiation Method/ Phương thức khởi tạo
-    ['38', '0010A00000072701270006970436011308410000534310208QRIBFTTA'], // Consumer Account Information/ Thông tin định danh người thụ hưởng
-    ['53', '704'], // Transaction Currency/ Mã tiền tệ
-    ['54', '100000'], // Transaction Amount/ Số tiền GD
-    ['58', 'VN'], // Country Code/ Mã quốc gia
-    ['62', '0819NVDThanhtoanAltisss'], // Additional Data Field Template/ Thông tin bổ sung
-    ['63', 'XXXX'], //CRC (Cyclic Redundancy Check)
-];
 
-const generateQrInitString = () => {
+
+const generateQrInitString = ({ acount_no, amount, note, bank_code }) => {
+    const infomatrix = [
+        ['00', '01'], // Payload Format Indicator/ Phiên bản dữ liệu
+        ['01', '12'], // Point of Initiation Method/ Phương thức khởi tạo
+        ['38', `0010A00000072701270006${bank_code}60113${acount_no}0208QRIBFTTA`], // Consumer Account Information/ Thông tin định danh người thụ hưởng
+        ['53', '704'], // Transaction Currency/ Mã tiền tệ
+        ['54', amount], // Transaction Amount/ Số tiền GD
+        ['58', 'VN'], // Country Code/ Mã quốc gia
+        ['62', `08${note.length >= 10 ? String(note.length) : '0' + String(note.length)}${note}`], // Additional Data Field Template/ Thông tin bổ sung
+        ['63', 'XXXX'], //CRC (Cyclic Redundancy Check)
+    ];
+    // -------
     let qrString = '';
-    qrmatrix.map(info => {
+    infomatrix.map(info => {
         const contentLenght = info[1].length;
         qrString += `${info[0]}${contentLenght >= 10 ? String(contentLenght) : '0' + String(contentLenght)}${info[1]}`;
     });
@@ -68,13 +70,24 @@ function crc16(s) {
     return (crc ^ 0) & 0xffff;
 }
 
-const generateFinalQrBankString = () => {
-    const initString = generateQrInitString();
+const generateFinalQrBankString = ({ acount_no, amount, note, bank_code }) => {
+    const initString = generateQrInitString({ acount_no, amount, note, bank_code });
     return `${initString}${crc16(initString).toString(16).toUpperCase()}`;
 };
 
-console.log('[generateFinalQrBankString]: ', generateFinalQrBankString());
+const qrString = generateFinalQrBankString({
+    acount_no: '0841000053431',
+    amount: '1000000',
+    note: 'NVDThanhtoanAltisss',
+    bank_code: '970436',
+});
+console.log('[generateFinalQrBankString]: ', qrString);
 
 qrcode.setErrorLevel('H');
-qrcode.generate(generateFinalQrBankString(), { small: true });
+qrcode.generate(qrString, { small: true });
 
+// 00020101021238570010A00000072701270006970416011308410000534310208QRIBFTTA530370454061000005802VN62230819NVDThanhtoanAltisss6304A3F0 // Acb
+// 00020101021238570010A00000072701270006970436011308410000534310208QRIBFTTA5303704540710000005802VN62230819NVDThanhtoanAltisss63047038 // Vietcombank
+
+// Mặc định: A000000727
+// 
