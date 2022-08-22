@@ -1,16 +1,19 @@
 const qrcode = require('qrcode-terminal');
 
+const lengthToString = (string) => {
 
+    return string.length >= 10 ? String(string.length) : '0' + String(string.length);
+}
 
 const generateQrInitString = ({ acount_no, amount, note, bank_code }) => {
     const infomatrix = [
         ['00', '01'], // Payload Format Indicator/ Phiên bản dữ liệu
         ['01', '12'], // Point of Initiation Method/ Phương thức khởi tạo
-        ['38', `0010A00000072701270006${bank_code}0113${acount_no}0208QRIBFTTA`], // Consumer Account Information/ Thông tin định danh người thụ hưởng
+        ['38',`0010A000000727012700${lengthToString(bank_code)}${bank_code}01${lengthToString(acount_no)}${acount_no}0208QRIBFTTA`,], // Consumer Account Information/ Thông tin định danh người thụ hưởng
         ['53', '704'], // Transaction Currency/ Mã tiền tệ
         ['54', amount], // Transaction Amount/ Số tiền GD
         ['58', 'VN'], // Country Code/ Mã quốc gia
-        ['62', `08${note.length >= 10 ? String(note.length) : '0' + String(note.length)}${note}`], // Additional Data Field Template/ Thông tin bổ sung
+        ['62', `08${lengthToString(note)}${note}`], // Additional Data Field Template/ Thông tin bổ sung
         ['63', 'XXXX'], //CRC (Cyclic Redundancy Check)
     ];
     // -------
